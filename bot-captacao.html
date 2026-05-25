@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bot de Captação — Roteiro WhatsApp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Fira+Code:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b1a12;
+      --surface: #101f16;
+      --card: #152019;
+      --border: #1e3326;
+      --green: #25d366;
+      --green-dark: #128c44;
+      --green-light: #dcf8c6;
+      --yellow: #ffd700;
+      --muted: #7fa98a;
+      --white: #f0f7f2;
+      --mono: 'Fira Code', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Lato', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Grid bg */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,211,102,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,211,102,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      margin-bottom: 56px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--green);
+      border: 1px solid var(--green-dark);
+      padding: 4px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(36px, 7vw, 68px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .header h1 span { color: var(--green); }
+
+    .header p {
+      color: var(--muted);
+      font-size: 16px;
+      margin-top: 14px;
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    /* ── PHONE PREVIEW ── */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 56px;
+      animation: fadeUp 0.5s 0.1s ease both;
+    }
+
+    .phone {
+      background: #111b21;
+      border-radius: 32px;
+      width: 100%;
+      max-width: 420px;
+      padding: 0;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(37,211,102,0.1);
+    }
+
+    .phone-bar {
+      background: #1f2c34;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .phone-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--green-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .phone-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .phone-status {
+      font-size: 12px;
+      color: var(--green);
+    }
+
+    .phone-body {
+      background: #0b141a;
+      padding: 16px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23182028' fill-opacity='0.6'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+      animation: bubbleIn 0.3s ease both;
+    }
+
+    .bubble.bot {
+      background: #1f2c34;
+      color: #e9edef;
+      border-radius: 0 12px 12px 12px;
+      align-self: flex-start;
+    }
+
+    .bubble.user {
+      background: #005c4b;
+      color: #e9edef;
+      border-radius: 12px 12px 0 12px;
+      align-self: flex-end;
+    }
+
+    .bubble .time {
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* ── STEPS ── */
+    .steps-section {
+      margin-bottom: 56px;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .sec-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .sec-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 800;
+      margin-bottom: 28px;
+      letter-spacing: -0.5px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.25s ease;
+    }
+
+    .step-card:hover { border-color: var(--green-dark); }
+
+    .step-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--green-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .step-info { flex: 1; }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 2px;
+    }
+
+    .step-toggle {
+      font-size: 18px;
+      color: var(--muted);
+      transition: transform 0.3s ease;
+    }
+
+    .step-card.open .step-toggle { transform: rotate(180deg); color: var(--green); }
+
+    .step-body {
+      display: none;
+      padding: 0 20px 20px;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-card.open .step-body { display: flex; }
+
+    /* Message block */
+    .msg-block {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .msg-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      padding: 6px 14px;
+      font-weight: 500;
+    }
+
+    .msg-label.bot-label {
+      background: #1a2e22;
+      color: var(--green);
+    }
+
+    .msg-label.user-label {
+      background: #003328;
+      color: #7ecf8e;
+    }
+
+    .msg-label.logic-label {
+      background: #2a2000;
+      color: var(--yellow);
+    }
+
+    .msg-text {
+      background: var(--surface);
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #ccd;
+      white-space: pre-line;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .msg-text em {
+      color: var(--green);
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    /* ── FOLLOW-UP ── */
+    .followup-section {
+      margin-bottom: 56px;
+      animation: fadeUp 0.5s 0.2s ease both;
+    }
+
+    .followup-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .fu-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 20px;
+      position: relative;
+    }
+
+    .fu-time-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fu-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--green);
+      background: var(--card);
+      border: 1px solid var(--green-dark);
+      border-radius: 8px;
+      padding: 6px 8px;
+      text-align: center;
+      width: 72px;
+      line-height: 1.3;
+    }
+
+    .fu-line {
+      width: 1px;
+      flex: 1;
+      background: var(--border);
+      min-height: 20px;
+      margin: 4px 0;
+    }
+
+    .fu-item:last-child .fu-line { display: none; }
+
+    .fu-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s ease;
+    }
+
+    .fu-card:hover { border-color: var(--green-dark); }
+
+    .fu-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .fu-msg {
+      font-size: 14px;
+      line-height: 1.65;
+      color: #ccd;
+      white-space: pre-line;
+    }
+
+    .fu-msg em { color: var(--green); font-style: normal; font-weight: 700; }
+
+    /* ── COPY BUTTONS ── */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      background: transparent;
+      border: 1px solid var(--green-dark);
+      color: var(--green);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .copy-btn:hover { background: var(--green-dark); }
+    .copy-btn.copied { border-color: var(--yellow); color: var(--yellow); }
+
+    /* ── SETUP BOX ── */
+    .setup-box {
+      background: var(--card);
+      border: 1px solid var(--green-dark);
+      border-radius: 20px;
+      padding: 32px;
+      animation: fadeUp 0.5s 0.25s ease both;
+    }
+
+    .setup-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .setup-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      counter-reset: setup;
+    }
+
+    .setup-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .setup-n {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--green-dark);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--mono);
+    }
+
+    .setup-text {
+      font-size: 14px;
+      color: #ccd;
+      line-height: 1.6;
+      padding-top: 4px;
+    }
+
+    .setup-text strong { color: var(--green); }
+    .setup-text a { color: var(--green); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bubbleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="tag">// roteiro-bot-whatsapp.flow</div>
+    <h1>Bot de<br><span>Captação</span></h1>
+    <p>Mensagens exatas que o proprietário vai receber — copie, cole no Typebot e ative.</p>
+  </header>
+
+  <!-- PHONE PREVIEW -->
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="phone-bar">
+        <div class="phone-avatar">🏠</div>
+        <div>
+          <div class="phone-name">Corretor Piracicaba</div>
+          <div class="phone-status">● online</div>
+        </div>
+      </div>
+      <div class="phone-body">
+        <div class="bubble bot">
+          Olá! 👋 Vi que você tem interesse em saber o valor do seu imóvel em Piracicaba.
+          <div class="time">09:01</div>
+        </div>
+        <div class="bubble bot">
+          Sou o assistente do <strong>[seu nome]</strong>, corretor especialista na região. Vou te enviar uma avaliação gratuita em até 24h! 🎯
+          <div class="time">09:01</div>
+        </div>
+        <div class="bubble bot">
+          Pra começar, qual é o seu nome? 😊
+          <div class="time">09:02</div>
+        </div>
+        <div class="bubble user">
+          Carlos
+          <div class="time">09:03</div>
+        </div>
+        <div class="bubble bot">
+          Oi Carlos! Que legal 🙌 Me conta: o imóvel é casa ou apartamento?
+          <div class="time">09:03</div>
+        </div>
+        <div class="bubble user">
+          Casa
+          <div class="time">09:04</div>
+        </div>
+        <div class="bubble bot">
+          Perfeito! Em qual bairro fica? 📍
+          <div class="time">09:04</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROTEIRO COMPLETO -->
+  <section class="steps-section">
+    <div class="sec-label">01 — Fluxo principal</div>
+    <div class="sec-title">Roteiro Completo do Bot</div>
+
+    <div class="step-list">
+
+      <!-- ETAPA 1 -->
+      <div class="step-card open">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">👋</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 01</div>
+            <div class="step-title">Boas-vindas e apresentação</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA</div>
+            <div class="msg-text" id="msg1">Olá! 👋 Vi que você tem interesse em saber o valor do seu imóvel em Piracicaba.
+
+Sou o assistente do <em>[seu nome]</em>, corretor especialista na região. 🏠
+
+Vou te enviar uma <em>avaliação gratuita e sem compromisso</em> em até 24h!
+
+Pra começar, qual é o seu nome?</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg1', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+      <!-- ETAPA 2 -->
+      <div class="step-card">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">🏠</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 02</div>
+            <div class="step-title">Tipo e localização do imóvel</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA</div>
+            <div class="msg-text" id="msg2">Oi <em>[nome]</em>! Que bom falar com você 🙌
+
+Me conta um pouco sobre o imóvel:
+
+1️⃣ É <em>casa ou apartamento</em>?
+2️⃣ Em qual <em>bairro</em> fica?
+3️⃣ Qual a <em>metragem aproximada</em>? (ex: 120m²)</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg2', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+      <!-- ETAPA 3 -->
+      <div class="step-card">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">📐</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 03</div>
+            <div class="step-title">Características do imóvel</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA</div>
+            <div class="msg-text" id="msg3">Ótimo! Quase lá 😊
+
+Mais algumas informações rápidas:
+
+🛏 Quantos <em>quartos</em>?
+🚗 Tem <em>garagem</em>? (sim / não)
+🏊 Tem <em>piscina ou área de lazer</em>? (sim / não)
+📅 Qual o <em>ano de construção</em> aproximado?</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg3', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+      <!-- ETAPA 4 -->
+      <div class="step-card">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">🎯</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 04</div>
+            <div class="step-title">Intenção de venda</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA</div>
+            <div class="msg-text" id="msg4">Perfeito <em>[nome]</em>! Já tenho quase tudo 👌
+
+Última pergunta:
+
+Você pretende <em>vender o imóvel</em>?
+
+1 — Sim, quero vender em breve
+2 — Estou só curiosa(o) sobre o valor
+3 — Pode ser, dependendo do valor
+
+Responde com o número 😊</div>
+          </div>
+          <div class="msg-block" style="margin-top:8px">
+            <div class="msg-label logic-label">⚡ LÓGICA — se responder "1"</div>
+            <div class="msg-text">→ Marcar como <em>LEAD QUENTE</em> no CRM e notificar você imediatamente</div>
+          </div>
+          <div class="msg-block" style="margin-top:8px">
+            <div class="msg-label logic-label">⚡ LÓGICA — se responder "2" ou "3"</div>
+            <div class="msg-text">→ Marcar como <em>LEAD MORNO</em> e entrar no follow-up automático de 7 dias</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg4', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+      <!-- ETAPA 5 -->
+      <div class="step-card">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">✅</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 05</div>
+            <div class="step-title">Confirmação e próximo passo</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA</div>
+            <div class="msg-text" id="msg5">Perfeito <em>[nome]</em>! Recebi tudo 🎉
+
+📊 Vou preparar a avaliação do seu imóvel e te envio em <em>até 24 horas</em>.
+
+Enquanto isso, você pode conferir outros imóveis e dicas da região no nosso Instagram:
+👉 instagram.com/<em>[seu_perfil]</em>
+
+Qualquer dúvida é só chamar aqui! 😊</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg5', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+      <!-- ETAPA 6 — NOTIFICAÇÃO -->
+      <div class="step-card">
+        <div class="step-head" onclick="toggleCard(this)">
+          <div class="step-icon">🔔</div>
+          <div class="step-info">
+            <div class="step-num">ETAPA 06</div>
+            <div class="step-title">Notificação para você (lead quente)</div>
+          </div>
+          <div class="step-toggle">▼</div>
+        </div>
+        <div class="step-body">
+          <div class="msg-block">
+            <div class="msg-label bot-label">🤖 BOT ENVIA PARA VOCÊ</div>
+            <div class="msg-text" id="msg6">🔥 <em>LEAD QUENTE — CAPTAÇÃO</em>
+
+👤 Nome: [nome do proprietário]
+🏠 Tipo: [casa/apto]
+📍 Bairro: [bairro]
+📐 Metragem: [m²]
+🛏 Quartos: [n°]
+🚗 Garagem: [sim/não]
+📅 Construção: [ano]
+💬 Intenção: Quer vender em breve
+
+📱 Contato: [número do WhatsApp]
+
+⏱ Responder em até 5 minutos!</div>
+          </div>
+          <button class="copy-btn" onclick="copyMsg('msg6', this)">📋 Copiar mensagem</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOLLOW-UP -->
+  <section class="followup-section">
+    <div class="sec-label">02 — Recuperação</div>
+    <div class="sec-title">Sequência de Follow-up (7 dias)</div>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:28px; font-weight:300;">Para quem não responder ou ficou morno. Roda automaticamente.</p>
+
+    <div class="followup-timeline">
+
+      <div class="fu-item">
+        <div class="fu-time-col">
+          <div class="fu-time">24h depois</div>
+          <div class="fu-line"></div>
+        </div>
+        <div class="fu-card">
+          <div class="fu-tag">MENSAGEM 1 — REENGAJAMENTO</div>
+          <div class="fu-msg" id="fu1">Oi <em>[nome]</em>! 😊 Tudo bem?
+
+Passando pra avisar que sua avaliação já está quase pronta.
+
+Você ainda tem interesse em saber o valor do seu imóvel?</div>
+          <button class="copy-btn" onclick="copyMsg('fu1', this)">📋 Copiar</button>
+        </div>
+      </div>
+
+      <div class="fu-item">
+        <div class="fu-time-col">
+          <div class="fu-time">3 dias depois</div>
+          <div class="fu-line"></div>
+        </div>
+        <div class="fu-card">
+          <div class="fu-tag">MENSAGEM 2 — PROVA SOCIAL</div>
+          <div class="fu-msg" id="fu2">Oi <em>[nome]</em>! Sabia que essa semana avaliamos <em>12 imóveis</em> só no bairro de vocês? 📊
+
+Muitos proprietários ficaram surpresos com o valor — alguns bem acima do que imaginavam!
+
+Quer receber sua avaliação gratuita? É só me falar 😊</div>
+          <button class="copy-btn" onclick="copyMsg('fu2', this)">📋 Copiar</button>
+        </div>
+      </div>
+
+      <div class="fu-item">
+        <div class="fu-time-col">
+          <div class="fu-time">7 dias depois</div>
+          <div class="fu-line"></div>
+        </div>
+        <div class="fu-card">
+          <div class="fu-tag">MENSAGEM 3 — ÚLTIMA CHANCE</div>
+          <div class="fu-msg" id="fu3"><em>[Nome]</em>, não quero incomodar 😊
+
+Só passando pra deixar meu contato caso você precise no futuro:
+
+📱 <em>[seu número]</em>
+📸 <em>instagram.com/[seu_perfil]</em>
+
+Qualquer dúvida sobre imóveis em Piracicaba, pode chamar! Fico feliz em ajudar 🏠✨</div>
+          <button class="copy-btn" onclick="copyMsg('fu3', this)">📋 Copiar</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <div class="setup-box">
+    <h2>⚡ Como cadastrar no Typebot agora</h2>
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="setup-n">1</div>
+        <div class="setup-text">Acesse <strong>typebot.io</strong> → crie uma conta grátis → clique em <strong>"New Typebot"</strong></div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-n">2</div>
+        <div class="setup-text">Escolha <strong>"Start from scratch"</strong> → arraste os blocos de <strong>"Send message"</strong> e <strong>"Wait for input"</strong></div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-n">3</div>
+        <div class="setup-text">Cole cada mensagem deste roteiro nos blocos, na ordem das etapas acima</div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-n">4</div>
+        <div class="setup-text">No bloco da etapa 04, adicione uma <strong>condição (Condition)</strong>: se resposta = "1" → webhook notifica você via Z-API</div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-n">5</div>
+        <div class="setup-text">Vá em <strong>"Publish"</strong> → copie a URL do webhook do Typebot → cole no painel da <strong>Z-API em "Webhooks"</strong></div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-n">6</div>
+        <div class="setup-text">Envie uma mensagem de teste pro número e confirme que o bot responde. <strong>Pronto — está no ar.</strong> 🎉</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleCard(el) {
+    el.parentElement.classList.toggle('open');
+  }
+
+  function copyMsg(id, btn) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✅ Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 Copiar mensagem';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

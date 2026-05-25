@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DARK AI IMOB Radar</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --red:     #ff2222;
+      --red-dim: #6b0000;
+      --bg:      #060608;
+      --surface: #0d0d10;
+      --border:  rgba(255,255,255,0.07);
+      --muted:   #555;
+      --text:    #e8e8e8;
+      --green:   #00ff88;
+      --yellow:  #ffd460;
+      --mono:    'JetBrains Mono', monospace;
+      --sans:    'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      overflow-x: hidden;
+    }
+
+    /* Subtle noise texture on body */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+      animation: fadeUp .6s ease both;
+    }
+
+    .logo-mark {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--red), var(--red-dim));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 900;
+      box-shadow: 0 0 30px rgba(255,34,34,.35);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    header h1 span { color: var(--red); }
+
+    header p {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .35rem;
+      letter-spacing: .05em;
+    }
+
+    /* ── GRID ── */
+    .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.4rem; }
+    @media(max-width:860px){ .grid { grid-template-columns: 1fr; } }
+
+    /* ── PANEL ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.8rem;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── FORM ── */
+    .field { margin-bottom: 1.1rem; }
+    .field label {
+      display: block;
+      font-family: var(--mono);
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .45rem;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: #111115;
+      border: 1px solid #222;
+      border-radius: 10px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .82rem;
+      padding: .85rem 1rem;
+      outline: none;
+      transition: border-color .2s;
+      resize: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus { border-color: var(--red); }
+
+    .field select option { background: #111115; }
+
+    .btn-analyze {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--red), #990000);
+      color: white;
+      font-family: var(--sans);
+      font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: .05em;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 0 20px rgba(255,34,34,.25);
+    }
+
+    .btn-analyze:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(255,34,34,.45);
+    }
+
+    .btn-analyze:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── RIGHT COL ── */
+    .right { display: flex; flex-direction: column; gap: 1.4rem; }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .status-bar h2 { font-size: 1.3rem; font-weight: 800; }
+    .status-bar p { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: .4rem .9rem;
+      border-radius: 999px;
+    }
+
+    .badge-red  { background: rgba(255,34,34,.15); color: var(--red); border: 1px solid rgba(255,34,34,.3); }
+    .badge-green{ background: rgba(0,255,136,.1); color: var(--green); border: 1px solid rgba(0,255,136,.25); }
+    .badge-yellow{ background: rgba(255,212,96,.1); color: var(--yellow); border: 1px solid rgba(255,212,96,.25); }
+
+    /* ── SCORE GRID ── */
+    .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media(max-width:500px){ .score-grid { grid-template-columns: 1fr; } }
+
+    .score-card { padding: 1.2rem 1.4rem; }
+
+    .score-label {
+      font-family: var(--mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: .7rem;
+    }
+
+    .score-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: .7rem; }
+
+    .score-val {
+      font-size: 1.9rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-track {
+      height: 5px;
+      border-radius: 999px;
+      background: #1a1a1e;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 1.2s cubic-bezier(.22,1,.36,1);
+    }
+
+    /* ── ANALYSIS ── */
+    #resultado { font-family: var(--mono); font-size: .78rem; line-height: 1.7; }
+
+    .res-block {
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1rem;
+      animation: fadeUp .4s ease both;
+    }
+
+    .res-block h3 {
+      font-family: var(--sans);
+      font-size: .85rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: .8rem;
+    }
+
+    .res-block ul { list-style: none; }
+    .res-block ul li { padding: .25rem 0; color: #bbb; }
+    .res-block ul li::before { content: '▸ '; color: var(--green); }
+
+    .res-block p { color: #aaa; }
+
+    /* typing cursor */
+    .typing::after {
+      content: '█';
+      animation: blink .7s step-end infinite;
+      color: var(--red);
+      font-size: .7em;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* loader dots */
+    .loader {
+      display: flex; gap: .5rem; align-items: center;
+      padding: 1.5rem;
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--muted);
+    }
+    .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--red);
+      animation: pulse 1.2s ease infinite;
+    }
+    .dot:nth-child(2){ animation-delay: .2s; }
+    .dot:nth-child(3){ animation-delay: .4s; }
+
+    @keyframes pulse { 0%,100%{ opacity:.3; transform:scale(.8) } 50%{ opacity:1; transform:scale(1) } }
+    @keyframes fadeUp { from{ opacity:0; transform:translateY(14px) } to{ opacity:1; transform:translateY(0) } }
+
+    /* error */
+    .error-box {
+      background: rgba(255,34,34,.08);
+      border: 1px solid rgba(255,34,34,.3);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: #ff8080;
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-mark">D</div>
+    <div>
+      <h1>DARK AI <span>IMOB</span> Radar</h1>
+      <p>// inteligência artificial para escolher o melhor imóvel para Meta Ads</p>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- FORM -->
+    <div class="panel" style="animation:fadeUp .5s .1s ease both">
+      <div class="panel-title">Inserir Informações</div>
+
+      <div class="field">
+        <label>Link do Imóvel</label>
+        <input id="linkImovel" type="text" placeholder="https://..."/>
+      </div>
+
+      <div class="field">
+        <label>Link do Empreendimento</label>
+        <input id="linkEmpreendimento" type="text" placeholder="https://..."/>
+      </div>
+
+      <div class="field">
+        <label>Cidade / Região</label>
+        <input id="cidade" type="text" placeholder="Piracicaba/SP"/>
+      </div>
+
+      <div class="field">
+        <label>Faixa de Preço</label>
+        <select id="faixa">
+          <option>Minha Casa Minha Vida</option>
+          <option>Médio Padrão</option>
+          <option>Alto Padrão</option>
+          <option>Luxo</option>
+          <option>Loteamento</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Informações Adicionais</label>
+        <textarea id="info" rows="5" placeholder="Ex: varanda gourmet, piscina, 3 quartos, financiamento direto, FGTS..."></textarea>
+      </div>
+
+      <button id="btnAnalyze" class="btn-analyze" onclick="analisarImovel()">
+        ▶ ANALISAR IMÓVEL
+      </button>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+
+      <!-- STATUS -->
+      <div class="panel" style="animation:fadeUp .5s .2s ease both">
+        <div class="status-bar">
+          <div>
+            <h2>Resultado da IA</h2>
+            <p>// análise inteligente de mercado imobiliário</p>
+          </div>
+          <span id="badgeStatus" class="badge badge-red">IA ATIVA</span>
+        </div>
+      </div>
+
+      <!-- SCORES -->
+      <div class="score-grid">
+
+        <div class="panel score-card" style="animation:fadeUp .5s .3s ease both">
+          <div class="score-label">Potencial de Lead</div>
+          <div class="score-row">
+            <span id="leadVal" class="score-val" style="color:var(--green)">—</span>
+          </div>
+          <div class="score-track"><div id="leadBar" class="score-fill" style="background:var(--green)"></div></div>
+        </div>
+
+        <div class="panel score-card" style="animation:fadeUp .5s .35s ease both">
+          <div class="score-label">Potencial de Escala</div>
+          <div class="score-row">
+            <span id="escalaVal" class="score-val" style="color:#60cfff">—</span>
+          </div>
+          <div class="score-track"><div id="escalaBar" class="score-fill" style="background:#60cfff"></div></div>
+        </div>
+
+        <div class="panel score-card" style="animation:fadeUp .5s .4s ease both">
+          <div class="score-label">Atratividade Visual</div>
+          <div class="score-row">
+            <span id="visualVal" class="score-val" style="color:var(--yellow)">—</span>
+          </div>
+          <div class="score-track"><div id="visualBar" class="score-fill" style="background:var(--yellow)"></div></div>
+        </div>
+
+        <div class="panel score-card" style="animation:fadeUp .5s .45s ease both">
+          <div class="score-label">Baixa Saturação</div>
+          <div class="score-row">
+            <span id="saturacaoVal" class="score-val" style="color:#c084fc">—</span>
+          </div>
+          <div class="score-track"><div id="saturacaoBar" class="score-fill" style="background:#c084fc"></div></div>
+        </div>
+
+      </div>
+
+      <!-- ANÁLISE TEXT -->
+      <div class="panel" style="animation:fadeUp .5s .5s ease both">
+        <div class="panel-title">Estratégia Recomendada</div>
+        <div id="resultado">
+          <div class="res-block">
+            <p>Preencha os campos e clique em <strong>Analisar Imóvel</strong> para receber a análise completa gerada por IA.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right -->
+  </div><!-- /grid -->
+
+</div><!-- /wrap -->
+
+<script>
+  // ─── helpers ───────────────────────────────────────────────────────────
+  function setBar(barId, valId, value){
+    document.getElementById(barId).style.width = value + '%';
+    document.getElementById(valId).textContent  = value + '%';
+  }
+
+  function setLoader(msg){
+    document.getElementById('resultado').innerHTML = `
+      <div class="loader">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <span>${msg}</span>
+      </div>`;
+  }
+
+  function showError(msg){
+    document.getElementById('resultado').innerHTML =
+      `<div class="error-box">⚠ ${msg}</div>`;
+  }
+
+  function resetScores(){
+    ['leadBar','escalaBar','visualBar','saturacaoBar'].forEach(id =>
+      document.getElementById(id).style.width = '0%');
+    ['leadVal','escalaVal','visualVal','saturacaoVal'].forEach(id =>
+      document.getElementById(id).textContent = '—');
+  }
+
+  // ─── render resultado ──────────────────────────────────────────────────
+  function renderResultado(data){
+    setTimeout(()=> setBar('leadBar','leadVal',           data.scores.lead),      100);
+    setTimeout(()=> setBar('escalaBar','escalaVal',       data.scores.escala),    200);
+    setTimeout(()=> setBar('visualBar','visualVal',       data.scores.visual),    300);
+    setTimeout(()=> setBar('saturacaoBar','saturacaoVal', data.scores.saturacao), 400);
+
+    const avg = (data.scores.lead + data.scores.escala + data.scores.visual + data.scores.saturacao) / 4;
+    const badge = document.getElementById('badgeStatus');
+    if(avg >= 75){ badge.className='badge badge-green';  badge.textContent='ALTA CHANCE'; }
+    else if(avg >= 55){ badge.className='badge badge-yellow'; badge.textContent='POTENCIAL MÉDIO'; }
+    else { badge.className='badge badge-red'; badge.textContent='BAIXO POTENCIAL'; }
+
+    const blocks = [
+      { title: '🔍 Fontes Pesquisadas',          list: data.fontes },
+      { title: '📊 Resumo Estratégico',           content: data.resumo },
+      { title: '🎯 Melhor Estratégia Meta Ads',   list: data.estrategia },
+      { title: '✍️ Copy Recomendado',             content: data.copy ? `"${data.copy}"` : null },
+      { title: '🎬 Criativos que Convertem',      list: data.criativos },
+      { title: '👥 Público-Alvo Ideal',           list: data.publico },
+      { title: '⚠️ Alertas & Riscos',             list: data.alertas },
+    ];
+
+    const notice = data._searchBlocked
+      ? `<div class="res-block" style="border-color:rgba(255,212,96,.25);background:rgba(255,212,96,.04)">
+           <h3 style="color:var(--yellow)">⚠️ Pesquisa Web Indisponível</h3>
+           <p>Limite de uso do web search atingido nesta janela de 5h. A análise foi feita com base nos dados que você preencheu. Tente novamente mais tarde para obter dados de mercado em tempo real.</p>
+         </div>` : '';
+
+    document.getElementById('resultado').innerHTML = notice + blocks
+      .filter(b => (b.list && b.list.length) || b.content)
+      .map((b,i) => `
+        <div class="res-block" style="animation-delay:${i*0.08}s">
+          <h3>${b.title}</h3>
+          ${b.content ? `<p>${b.content}</p>` : ''}
+          ${b.list    ? `<ul>${b.list.map(l=>`<li>${l}</li>`).join('')}</ul>` : ''}
+        </div>`).join('');
+  }
+
+  // ─── call API (with or without web_search) ────────────────────────────
+  async function callAPI(messages, useSearch, onStep){
+    const body = {
+      model:      'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      messages
+    };
+    if(useSearch) body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const raw = await resp.json();
+
+    // detect rate-limit on web search
+    if(!resp.ok){
+      const isRateLimit = JSON.stringify(raw).includes('exceeded_limit');
+      const err = new Error(raw.error?.message || JSON.stringify(raw));
+      err.isRateLimit = isRateLimit;
+      throw err;
+    }
+
+    return raw;
+  }
+
+  // ─── agentic loop with web_search + graceful fallback ─────────────────
+  async function callWithTools(messages, onStep){
+    let history = [...messages];
+    let useSearch = true;
+    let searchBlocked = false;
+    let iterations = 0;
+
+    while(iterations++ < 8){
+      let raw;
+      try {
+        raw = await callAPI(history, useSearch, onStep);
+      } catch(e){
+        if(e.isRateLimit && useSearch){
+          // web search rate-limited → retry without search
+          useSearch = false;
+          searchBlocked = true;
+          onStep('⚠️ Web search indisponível (limite atingido). Analisando com dados fornecidos...');
+          raw = await callAPI(history, false, onStep);
+        } else {
+          throw e;
+        }
+      }
+
+      const content = raw.content || [];
+
+      // show search queries
+      const toolUses = content.filter(c => c.type === 'tool_use');
+      if(toolUses.length > 0 && !searchBlocked){
+        const queries = toolUses.map(b => b.input?.query || '…').join(' | ');
+        onStep(`🔍 Pesquisando: ${queries}`);
+      }
+
+      // done
+      if(raw.stop_reason === 'end_turn'){
+        const text = content.filter(c => c.type === 'text').map(c => c.text).join('');
+        return { text, searchBlocked };
+      }
+
+      history.push({ role: 'assistant', content });
+
+      const toolResults = content
+        .filter(c => c.type === 'web_search_tool_result')
+        .map(c => ({ type: 'tool_result', tool_use_id: c.tool_use_id, content: c.content }));
+
+      if(toolResults.length > 0){
+        history.push({ role: 'user', content: toolResults });
+      } else {
+        break;
+      }
+    }
+
+    const text = history
+      .flatMap(m => Array.isArray(m.content) ? m.content : [{type:'text',text:String(m.content)}])
+      .filter(c => c.type === 'text').map(c => c.text).join('');
+    return { text, searchBlocked };
+  }
+
+  // ─── main ──────────────────────────────────────────────────────────────
+  async function analisarImovel(){
+    const cidade  = document.getElementById('cidade').value.trim();
+    const faixa   = document.getElementById('faixa').value;
+    const info    = document.getElementById('info').value.trim();
+    const linkIm  = document.getElementById('linkImovel').value.trim();
+    const linkEmp = document.getElementById('linkEmpreendimento').value.trim();
+
+    if(!cidade && !info && !linkIm && !linkEmp){
+      showError('Preencha ao menos um campo antes de analisar.');
+      return;
+    }
+
+    const btn = document.getElementById('btnAnalyze');
+    btn.disabled = true;
+    resetScores();
+    setLoader('Iniciando pesquisa na web...');
+
+    const searchInstructions = (linkIm || linkEmp)
+      ? `PESQUISE NA WEB antes de analisar:
+${linkIm  ? `- Informações sobre: ${linkIm}` : ''}
+${linkEmp ? `- Empreendimento: ${linkEmp}` : ''}
+${cidade  ? `- Mercado imobiliário em ${cidade} na faixa ${faixa}` : ''}
+Busque nome do empreendimento, construtora, preços, diferenciais e concorrência na região.`
+      : `PESQUISE NA WEB: mercado imobiliário em ${cidade}, faixa ${faixa}, concorrentes ativos e saturação.`;
+
+    const prompt = `Você é um especialista em marketing imobiliário digital e Meta Ads com acesso à internet.
+
+${searchInstructions}
+
+DADOS FORNECIDOS PELO USUÁRIO:
+- Cidade/Região: ${cidade || 'não informada'}
+- Faixa de preço: ${faixa}
+- Link imóvel: ${linkIm || 'não informado'}
+- Link empreendimento: ${linkEmp || 'não informado'}
+- Informações adicionais: ${info || 'nenhuma'}
+
+Após pesquisar, retorne APENAS um JSON válido sem markdown:
+{
+  "scores": {
+    "lead": <0-100 baseado em dados reais>,
+    "escala": <0-100>,
+    "visual": <0-100>,
+    "saturacao": <0-100>
+  },
+  "fontes": ["<dado real encontrado 1>","<dado real 2>","<dado real 3>"],
+  "resumo": "<2-3 frases baseadas nos dados pesquisados>",
+  "estrategia": ["<objetivo campanha>","<formato anúncio>","<CTA ideal>","<orçamento diário>","<posicionamento>"],
+  "copy": "<headline para o anúncio baseado no imóvel real>",
+  "criativos": ["<criativo 1>","<criativo 2>","<criativo 3>","<criativo 4>"],
+  "publico": ["<público 1 com perfil>","<público 2>","<público 3>"],
+  "alertas": ["<risco 1>","<risco 2>","<recomendação final>"]
+}`;
+
+    try {
+      const { text, searchBlocked } = await callWithTools(
+        [{ role: 'user', content: prompt }],
+        (msg) => setLoader(msg)
+      );
+
+      setLoader('Processando análise final...');
+      const clean = text.replace(/```json|```/gi,'').trim();
+      const data  = JSON.parse(clean);
+      if(searchBlocked) data._searchBlocked = true;
+      renderResultado(data);
+
+    } catch(e){
+      console.error(e);
+      showError('Erro: ' + e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

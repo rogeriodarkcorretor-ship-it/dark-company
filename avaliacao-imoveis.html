@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avaliação de Imóveis — Piracicaba</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #f4efe6;
+      --paper:   #faf7f2;
+      --ink:     #1a1612;
+      --brown:   #3d2c1e;
+      --gold:    #c8973a;
+      --gold-lt: #f5e6c8;
+      --rust:    #a83820;
+      --green:   #1a5c38;
+      --green-lt:#e8f5ee;
+      --muted:   #7a6e64;
+      --border:  #ddd5c8;
+      --mono:    'Space Mono', monospace;
+      --serif:   'Playfair Display', serif;
+      --sans:    'Space Grotesk', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── noise texture overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ══════════════════════════
+       LAYOUT
+    ══════════════════════════ */
+    .page {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 48px 32px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { position: relative; height: auto; }
+    }
+
+    .sidebar-logo {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 40px;
+    }
+
+    .sidebar h1 {
+      font-family: var(--serif);
+      font-size: 42px;
+      line-height: 1.05;
+      margin-bottom: 12px;
+    }
+
+    .sidebar h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .sidebar .tagline {
+      font-size: 13px;
+      color: #8a7f74;
+      line-height: 1.6;
+      font-weight: 300;
+      margin-bottom: 40px;
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: #2e2820;
+      margin: 24px 0;
+    }
+
+    .sidebar-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #5a5048;
+      margin-bottom: 14px;
+    }
+
+    /* Metric boxes */
+    .metric-box {
+      background: #221e18;
+      border: 1px solid #2e2820;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 12px;
+      transition: border-color 0.3s ease;
+    }
+
+    .metric-box:hover { border-color: var(--gold); }
+
+    .metric-box .label {
+      font-size: 11px;
+      color: #5a5048;
+      font-family: var(--mono);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .metric-box .value {
+      font-family: var(--serif);
+      font-size: 26px;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .metric-box .sub {
+      font-size: 11px;
+      color: #5a5048;
+      margin-top: 4px;
+    }
+
+    /* Faixa bar */
+    .faixa-bar {
+      margin-top: 12px;
+      background: #2e2820;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .faixa-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), #e8c060);
+      border-radius: 4px;
+      width: 60%;
+      transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--mono);
+      margin-top: 16px;
+      transition: all 0.4s ease;
+    }
+
+    .status-badge.alto   { background: #3a1800; color: #ff8c42; border: 1px solid #6a2e00; }
+    .status-badge.medio  { background: #3a2e00; color: #f0c040; border: 1px solid #6a5200; }
+    .status-badge.padrao { background: #003a1a; color: #40c06a; border: 1px solid #006030; }
+    .status-badge.vazio  { background: #2e2820; color: #5a5048; border: 1px solid #3e3428; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 32px;
+      font-size: 11px;
+      color: #3e3428;
+      font-family: var(--mono);
+      line-height: 1.6;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      padding: 48px 40px;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 600px) { .main { padding: 32px 20px; } }
+
+    /* ── SECTION HEADER ── */
+    .sec-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+      margin-top: 40px;
+    }
+
+    .sec-header:first-of-type { margin-top: 0; }
+
+    .sec-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    .sec-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .sec-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── FORM GRID ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid.full { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a6e64' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(200,151,58,0.12);
+    }
+
+    .field input::placeholder { color: #bbb; font-weight: 300; }
+
+    /* ── CALC TABLE ── */
+    .calc-table {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .calc-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 16px;
+      padding: 12px 18px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease;
+    }
+
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row:hover { background: var(--gold-lt); }
+
+    .calc-row.header {
+      background: var(--ink);
+      color: var(--cream);
+      cursor: default;
+    }
+
+    .calc-row.header:hover { background: var(--ink); }
+
+    .calc-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .calc-row.header .calc-label { color: #8a7f74; font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+
+    .calc-val {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--brown);
+      text-align: right;
+      min-width: 90px;
+    }
+
+    .calc-row.header .calc-val { color: #8a7f74; font-size: 10px; }
+
+    .calc-unit {
+      font-size: 11px;
+      color: var(--border);
+      min-width: 72px;
+      text-align: right;
+    }
+
+    .calc-row.total {
+      background: var(--ink);
+      cursor: default;
+    }
+
+    .calc-row.total:hover { background: var(--ink); }
+
+    .calc-row.total .calc-label {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    .calc-row.total .calc-val {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .calc-row.total .calc-unit { color: #5a5048; }
+
+    /* ── MENSAGEM WA ── */
+    .wa-card {
+      background: #0a1a0f;
+      border: 1px solid #1a3a20;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .wa-header {
+      background: #128c44;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wa-icon {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .wa-header-text { font-size: 13px; font-weight: 600; color: #fff; }
+    .wa-header-sub  { font-size: 11px; color: rgba(255,255,255,0.7); }
+
+    .wa-body {
+      padding: 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .wa-bubble {
+      background: #005c4b;
+      color: #e9edef;
+      border-radius: 12px 2px 12px 12px;
+      padding: 12px 16px;
+      max-width: 90%;
+      font-size: 13.5px;
+      line-height: 1.65;
+      white-space: pre-line;
+      position: relative;
+    }
+
+    .wa-time {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    /* ── COPY BUTTON ── */
+    .btn-copy {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      color: var(--cream);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.15s ease;
+      margin-bottom: 40px;
+    }
+
+    .btn-copy:hover { background: var(--brown); transform: translateY(-1px); }
+    .btn-copy.copied { background: var(--green); }
+
+    /* ── BAIRROS TABLE ── */
+    .bairros-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 700px) { .bairros-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 420px) { .bairros-grid { grid-template-columns: 1fr; } }
+
+    .bairro-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .bairro-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .bairro-card.active {
+      border-color: var(--gold);
+      background: var(--gold-lt);
+    }
+
+    .bairro-nome {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .bairro-valor {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .bairro-obs {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── HISTORICO ── */
+    .hist-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .hist-table th {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: var(--ink);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .hist-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .hist-table tr:hover td { background: var(--gold-lt); }
+    .hist-table tr:last-child td { border-bottom: none; }
+
+    .hist-container {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .tag-alto   { background: #fee2cc; color: #a83820; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+    .tag-medio  { background: #fef3cc; color: #8a5a00; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+    .tag-padrao { background: var(--green-lt); color: var(--green); padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+
+    /* ── ANIMATIONS ── */
+    .fade-in { animation: fadeUp 0.5s ease both; }
+    .fade-in-2 { animation: fadeUp 0.5s 0.1s ease both; }
+    .fade-in-3 { animation: fadeUp 0.5s 0.2s ease both; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .number-anim {
+      display: inline-block;
+      transition: all 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Piracicaba · SP · 2026</div>
+
+    <h1>Avaliação<br><em>Imóvel</em></h1>
+    <p class="tagline">Estimativa inteligente de valor de mercado baseada em dados reais da cidade.</p>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Resultado</div>
+
+    <div class="metric-box">
+      <div class="label">VALOR ESTIMADO</div>
+      <div class="value" id="sb-valor">—</div>
+      <div class="sub" id="sb-sub">Preencha os dados ao lado</div>
+      <div class="faixa-bar"><div class="faixa-fill" id="faixa-fill"></div></div>
+    </div>
+
+    <div class="metric-box">
+      <div class="label">FAIXA DE MERCADO</div>
+      <div class="value" id="sb-faixa" style="font-size:16px;line-height:1.4">—</div>
+    </div>
+
+    <div class="metric-box">
+      <div class="label">VALOR POR M²</div>
+      <div class="value" id="sb-m2">—</div>
+    </div>
+
+    <div id="status-badge" class="status-badge vazio">
+      <div class="status-dot"></div>
+      <span id="status-text">Aguardando dados</span>
+    </div>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Ajustes aplicados</div>
+
+    <div id="ajustes-lista" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:#5a5048;font-family:var(--mono);line-height:1.6;">
+      <span>— preencha os campos —</span>
+    </div>
+
+    <div class="sidebar-footer">
+      Fórmula: m² × valor/m² × ajustes<br>
+      Fonte: pesquisa de mercado local<br>
+      Atualizado: Mai 2026
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="main">
+
+    <!-- DADOS DO PROPRIETÁRIO -->
+    <div class="sec-header fade-in">
+      <span class="sec-num">01</span>
+      <span class="sec-title">Dados do Proprietário</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="form-grid fade-in-2">
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="nome" placeholder="Ex: Carlos Mendes" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Telefone / WhatsApp</label>
+        <input type="text" id="telefone" placeholder="(19) 99999-0000" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Origem do Lead</label>
+        <select id="origem" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option>Meta Ads</option>
+          <option>Instagram Orgânico</option>
+          <option>Indicação</option>
+          <option>Google</option>
+          <option>WhatsApp</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Data do Contato</label>
+        <input type="date" id="data-contato" oninput="calcular()" />
+      </div>
+    </div>
+
+    <!-- DADOS DO IMÓVEL -->
+    <div class="sec-header fade-in" style="margin-top:36px">
+      <span class="sec-num">02</span>
+      <span class="sec-title">Dados do Imóvel</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="form-grid fade-in-2">
+      <div class="field">
+        <label>Tipo de Imóvel</label>
+        <select id="tipo" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option>Casa</option>
+          <option>Apartamento</option>
+          <option>Comercial</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bairro / Região</label>
+        <select id="bairro" onchange="calcular(); destacarBairro()">
+          <option value="">Selecione o bairro</option>
+          <option value="Alto">Alto</option>
+          <option value="Paulista">Paulista</option>
+          <option value="Centro">Centro</option>
+          <option value="Nova Piracicaba">Nova Piracicaba</option>
+          <option value="Jardim Elite">Jardim Elite</option>
+          <option value="Presidente">Presidente</option>
+          <option value="São Dimas">São Dimas</option>
+          <option value="Piracicamirim">Piracicamirim</option>
+          <option value="Ártemis">Ártemis</option>
+          <option value="Cidade Alta">Cidade Alta</option>
+          <option value="Morumbi">Morumbi</option>
+          <option value="Nova América">Nova América</option>
+          <option value="Vila Rezende">Vila Rezende</option>
+          <option value="Jardim Caxambu">Jardim Caxambu</option>
+          <option value="Outros">Outros</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Metragem (m²)</label>
+        <input type="number" id="m2" placeholder="Ex: 150" min="10" max="2000" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Nº de Quartos</label>
+        <select id="quartos" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option value="1">1 quarto</option>
+          <option value="2">2 quartos</option>
+          <option value="3">3 quartos</option>
+          <option value="4">4 quartos</option>
+          <option value="5">5+ quartos</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Vagas de Garagem</label>
+        <select id="garagem" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option value="0">Sem garagem</option>
+          <option value="1">1 vaga</option>
+          <option value="2">2 vagas</option>
+          <option value="3">3+ vagas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Piscina / Área de Lazer</label>
+        <select id="piscina" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option value="Sim">Sim</option>
+          <option value="Não">Não</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ano de Construção</label>
+        <input type="number" id="ano" placeholder="Ex: 2005" min="1950" max="2026" oninput="calcular()" />
+      </div>
+      <div class="field">
+        <label>Estado de Conservação</label>
+        <select id="conservacao" onchange="calcular()">
+          <option value="">Selecione</option>
+          <option value="Novo">Novo</option>
+          <option value="Bom">Bom</option>
+          <option value="Regular">Regular</option>
+          <option value="Ruim">Ruim</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- CÁLCULO DETALHADO -->
+    <div class="sec-header" style="margin-top:36px">
+      <span class="sec-num">03</span>
+      <span class="sec-title">Cálculo Automático</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="calc-table" id="calc-table">
+      <div class="calc-row header">
+        <div class="calc-label">Componente</div>
+        <div class="calc-val">Valor</div>
+        <div class="calc-unit">Unidade</div>
+      </div>
+      <div class="calc-row" id="row-base">
+        <div class="calc-label">Valor base por m² (bairro)</div>
+        <div class="calc-val" id="c-base">—</div>
+        <div class="calc-unit">R$/m²</div>
+      </div>
+      <div class="calc-row" id="row-tipo">
+        <div class="calc-label">Ajuste tipo de imóvel</div>
+        <div class="calc-val" id="c-tipo">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-quartos">
+        <div class="calc-label">Ajuste nº de quartos</div>
+        <div class="calc-val" id="c-quartos">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-garagem">
+        <div class="calc-label">Ajuste garagem</div>
+        <div class="calc-val" id="c-garagem">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-piscina">
+        <div class="calc-label">Ajuste piscina / lazer</div>
+        <div class="calc-val" id="c-piscina">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-idade">
+        <div class="calc-label">Ajuste idade do imóvel</div>
+        <div class="calc-val" id="c-idade">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-conservacao">
+        <div class="calc-label">Ajuste conservação</div>
+        <div class="calc-val" id="c-conservacao">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
+      <div class="calc-row" id="row-m2">
+        <div class="calc-label">Metragem</div>
+        <div class="calc-val" id="c-m2">—</div>
+        <div class="calc-unit">m²</div>
+      </div>
+      <div class="calc-row total">
+        <div class="calc-label">💰 Valor Total Estimado</div>
+        <div class="calc-val" id="c-total">—</div>
+        <div class="calc-unit" id="c-faixa-small" style="font-size:10px;color:#5a5048;line-height:1.4">—</div>
+      </div>
+    </div>
+
+    <!-- MENSAGEM WHATSAPP -->
+    <div class="sec-header" style="margin-top:36px">
+      <span class="sec-num">04</span>
+      <span class="sec-title">Mensagem para WhatsApp</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="wa-card" id="wa-card">
+      <div class="wa-header">
+        <div class="wa-icon">💬</div>
+        <div>
+          <div class="wa-header-text">Mensagem gerada automaticamente</div>
+          <div class="wa-header-sub" id="wa-dest">Preencha os dados para gerar</div>
+        </div>
+      </div>
+      <div class="wa-body">
+        <div class="wa-bubble">
+          <span id="wa-msg">Preencha todos os campos para gerar a mensagem de avaliação automaticamente.</span>
+          <div class="wa-time" id="wa-time">—</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-copy" id="btn-copy" onclick="copiarMensagem()">
+      <span>📋</span> <span id="btn-copy-text">Copiar mensagem</span>
+    </button>
+
+    <!-- TABELA DE BAIRROS -->
+    <div class="sec-header" style="margin-top:8px">
+      <span class="sec-num">05</span>
+      <span class="sec-title">Tabela de Bairros</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="bairros-grid" id="bairros-grid"></div>
+
+    <!-- HISTÓRICO -->
+    <div class="sec-header">
+      <span class="sec-num">06</span>
+      <span class="sec-title">Histórico de Avaliações</span>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="hist-container">
+      <table class="hist-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Bairro</th>
+            <th>Tipo</th>
+            <th>m²</th>
+            <th>Valor Est.</th>
+            <th>Status</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody id="hist-body">
+          <tr>
+            <td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn-copy" id="btn-salvar" onclick="salvarHistorico()" style="background:var(--green);margin-top:12px">
+      <span>💾</span> <span>Salvar no histórico</span>
+    </button>
+
+  </main>
+</div>
+
+<script>
+  // ── DADOS DE BAIRROS (mesmos valores da planilha) ──
+  const BAIRROS = {
+    "Alto":             { valor: 5800, obs: "Bairro nobre, alta demanda" },
+    "Paulista":         { valor: 4200, obs: "Boa infraestrutura" },
+    "Centro":           { valor: 4500, obs: "Valorização constante" },
+    "Nova Piracicaba":  { valor: 3600, obs: "Crescimento rápido" },
+    "Jardim Elite":     { valor: 3800, obs: "Boa localização" },
+    "Presidente":       { valor: 3200, obs: "Classe média" },
+    "São Dimas":        { valor: 3400, obs: "Infraestrutura consolidada" },
+    "Piracicamirim":    { valor: 2800, obs: "Popular, boa demanda" },
+    "Ártemis":          { valor: 2600, obs: "Periferia consolidada" },
+    "Cidade Alta":      { valor: 3100, obs: "Infraestrutura em expansão" },
+    "Morumbi":          { valor: 3700, obs: "Valorização recente" },
+    "Nova América":     { valor: 3000, obs: "Estável" },
+    "Vila Rezende":     { valor: 3300, obs: "Centro expandido" },
+    "Jardim Caxambu":   { valor: 2900, obs: "Bom custo-benefício" },
+    "Outros":           { valor: 3000, obs: "Valor médio geral" },
+  };
+
+  // Renderiza bairros
+  const grid = document.getElementById("bairros-grid");
+  Object.entries(BAIRROS).forEach(([nome, data]) => {
+    const el = document.createElement("div");
+    el.className = "bairro-card";
+    el.dataset.bairro = nome;
+    el.innerHTML = `
+      <div class="bairro-nome">${nome}</div>
+      <div class="bairro-valor">R$ ${data.valor.toLocaleString('pt-BR')}/m²</div>
+      <div class="bairro-obs">${data.obs}</div>`;
+    el.onclick = () => {
+      document.getElementById("bairro").value = nome;
+      calcular();
+      destacarBairro();
+    };
+    grid.appendChild(el);
+  });
+
+  function destacarBairro() {
+    const sel = document.getElementById("bairro").value;
+    document.querySelectorAll(".bairro-card").forEach(c => {
+      c.classList.toggle("active", c.dataset.bairro === sel);
+    });
+  }
+
+  // ── FÓRMULAS (idênticas à planilha) ──
+  function ajusteTipo(tipo) {
+    if (tipo === "Apartamento") return 1.10;
+    if (tipo === "Comercial")   return 1.15;
+    return 1.00;
+  }
+
+  function ajusteQuartos(q) {
+    return 1 + (q - 2) * 0.04;
+  }
+
+  function ajusteGaragem(g) {
+    return 1 + (g * 0.03);
+  }
+
+  function ajustePiscina(p) {
+    return p === "Sim" ? 1.07 : 1.00;
+  }
+
+  function ajusteIdade(ano) {
+    const mult = 1 - ((2026 - ano) * 0.005);
+    return Math.max(mult, 0.60); // mínimo 60%
+  }
+
+  function ajusteConservacao(c) {
+    if (c === "Novo")    return 1.10;
+    if (c === "Bom")     return 1.00;
+    if (c === "Regular") return 0.90;
+    if (c === "Ruim")    return 0.80;
+    return 1.00;
+  }
+
+  function fmt(n)  { return "R$ " + n.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+  function fmtM(n) { return n.toFixed(2) + "×"; }
+  function now()   { return new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}); }
+
+  let ultimoValor = 0;
+  let historico = [];
+
+  function calcular() {
+    const nome       = document.getElementById("nome").value.trim();
+    const tipo       = document.getElementById("tipo").value;
+    const bairroSel  = document.getElementById("bairro").value;
+    const m2val      = parseFloat(document.getElementById("m2").value);
+    const quartos    = parseInt(document.getElementById("quartos").value);
+    const garagem    = parseInt(document.getElementById("garagem").value);
+    const piscina    = document.getElementById("piscina").value;
+    const ano        = parseInt(document.getElementById("ano").value);
+    const conserv    = document.getElementById("conservacao").value;
+
+    const ok = tipo && bairroSel && m2val > 0 && quartos && !isNaN(garagem) && piscina && ano > 1950 && conserv;
+
+    if (!ok) {
+      document.getElementById("sb-valor").textContent = "—";
+      document.getElementById("sb-sub").textContent   = "Preencha os dados ao lado";
+      document.getElementById("sb-faixa").textContent = "—";
+      document.getElementById("sb-m2").textContent    = "—";
+      document.getElementById("status-badge").className = "status-badge vazio";
+      document.getElementById("status-text").textContent = "Aguardando dados";
+      document.getElementById("ajustes-lista").innerHTML = "<span>— preencha os campos —</span>";
+      document.getElementById("faixa-fill").style.width = "60%";
+      resetCalc();
+      return;
+    }
+
+    const valorBase = BAIRROS[bairroSel]?.valor || 3000;
+    const aT = ajusteTipo(tipo);
+    const aQ = ajusteQuartos(quartos);
+    const aG = ajusteGaragem(garagem);
+    const aP = ajustePiscina(piscina);
+    const aI = ajusteIdade(ano);
+    const aC = ajusteConservacao(conserv);
+
+    const total = m2val * valorBase * aT * aQ * aG * aP * aI * aC;
+    ultimoValor = total;
+
+    const faixaMin = total * 0.93;
+    const faixaMax = total * 1.07;
+    const m2Final  = total / m2val;
+
+    // Sidebar
+    document.getElementById("sb-valor").textContent = fmt(total);
+    document.getElementById("sb-sub").textContent   = (nome ? nome : "Imóvel") + " · " + bairroSel;
+    document.getElementById("sb-faixa").textContent = fmt(faixaMin) + "\n" + fmt(faixaMax);
+    document.getElementById("sb-m2").textContent    = fmt(m2Final) + "/m²";
+
+    // Faixa bar — visual entre 300k e 2M
+    const pct = Math.min(Math.max((total - 100000) / 1900000, 0.05), 0.97) * 100;
+    document.getElementById("faixa-fill").style.width = pct + "%";
+
+    // Status
+    let stClass, stText;
+    if (total >= 800000) { stClass = "alto";   stText = "🔥 Alto valor — Prioridade"; }
+    else if (total >= 400000) { stClass = "medio"; stText = "🟡 Valor médio — Acompanhar"; }
+    else { stClass = "padrao"; stText = "🟢 Captação padrão"; }
+    const badge = document.getElementById("status-badge");
+    badge.className = "status-badge " + stClass;
+    document.getElementById("status-text").textContent = stText;
+
+    // Ajustes lista
+    document.getElementById("ajustes-lista").innerHTML = `
+      <span>📍 ${bairroSel}: R$ ${valorBase.toLocaleString('pt-BR')}/m²</span>
+      <span>🏠 Tipo: ${fmtM(aT)}</span>
+      <span>🛏 Quartos: ${fmtM(aQ)}</span>
+      <span>🚗 Garagem: ${fmtM(aG)}</span>
+      <span>🏊 Lazer: ${fmtM(aP)}</span>
+      <span>📅 Idade: ${fmtM(aI)}</span>
+      <span>🔧 Conservação: ${fmtM(aC)}</span>
+    `;
+
+    // Tabela cálculo
+    document.getElementById("c-base").textContent       = fmt(valorBase).replace("R$ ","R$ ");
+    document.getElementById("c-tipo").textContent       = fmtM(aT);
+    document.getElementById("c-quartos").textContent    = fmtM(aQ);
+    document.getElementById("c-garagem").textContent    = fmtM(aG);
+    document.getElementById("c-piscina").textContent    = fmtM(aP);
+    document.getElementById("c-idade").textContent      = fmtM(aI);
+    document.getElementById("c-conservacao").textContent= fmtM(aC);
+    document.getElementById("c-m2").textContent         = m2val + " m²";
+    document.getElementById("c-total").textContent      = fmt(total);
+    document.getElementById("c-faixa-small").innerHTML  = fmt(faixaMin) + "<br>a " + fmt(faixaMax);
+
+    // Mensagem WA
+    const nomeFmt = nome || "proprietário(a)";
+    const dataHoje = new Date().toLocaleDateString('pt-BR');
+    const msg =
+`Olá, ${nomeFmt}! 🏠
+
+Sua avaliação gratuita ficou pronta!
+
+📍 Bairro: ${bairroSel}
+🏠 Tipo: ${tipo} | ${m2val}m²
+🛏 ${quartos} quarto(s) | 🚗 ${garagem} vaga(s)
+
+💰 Valor estimado: *${fmt(total)}*
+📊 Faixa de mercado: ${fmt(faixaMin)} – ${fmt(faixaMax)}
+
+Esses valores são baseados em imóveis vendidos recentemente na sua região. ✅
+
+Posso te apresentar uma proposta personalizada de venda. Quer marcar uma visita? 😊`;
+
+    document.getElementById("wa-msg").textContent  = msg;
+    document.getElementById("wa-time").textContent = now();
+    document.getElementById("wa-dest").textContent = nome ? "Para: " + nome : "Mensagem gerada";
+  }
+
+  function resetCalc() {
+    ["c-base","c-tipo","c-quartos","c-garagem","c-piscina","c-idade","c-conservacao","c-m2","c-total","c-faixa-small"].forEach(id => {
+      document.getElementById(id).textContent = "—";
+    });
+    document.getElementById("wa-msg").textContent = "Preencha todos os campos para gerar a mensagem de avaliação automaticamente.";
+    document.getElementById("wa-dest").textContent = "Preencha os dados para gerar";
+    document.getElementById("wa-time").textContent = "—";
+  }
+
+  function copiarMensagem() {
+    const msg = document.getElementById("wa-msg").textContent;
+    if (!msg || msg.includes("Preencha")) return;
+    navigator.clipboard.writeText(msg).then(() => {
+      const btn = document.getElementById("btn-copy");
+      const txt = document.getElementById("btn-copy-text");
+      btn.classList.add("copied");
+      txt.textContent = "✅ Copiado!";
+      setTimeout(() => { btn.classList.remove("copied"); txt.textContent = "Copiar mensagem"; }, 2500);
+    });
+  }
+
+  function salvarHistorico() {
+    const nome  = document.getElementById("nome").value.trim();
+    const tipo  = document.getElementById("tipo").value;
+    const bairro= document.getElementById("bairro").value;
+    const m2val = document.getElementById("m2").value;
+    if (!nome || !ultimoValor) { alert("Preencha os dados e calcule o valor primeiro."); return; }
+
+    const entry = {
+      nome, bairro, tipo, m2: m2val,
+      valor: ultimoValor,
+      data: new Date().toLocaleDateString('pt-BR')
+    };
+    historico.unshift(entry);
+    renderHistorico();
+
+    const btn = document.getElementById("btn-salvar");
+    btn.innerHTML = "<span>✅</span> <span>Salvo!</span>";
+    setTimeout(() => { btn.innerHTML = "<span>💾</span> <span>Salvar no histórico</span>"; }, 2000);
+  }
+
+  function renderHistorico() {
+    const tbody = document.getElementById("hist-body");
+    if (!historico.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = historico.map(h => {
+      const st = h.valor >= 800000 ? `<span class="tag-alto">🔥 Alto</span>`
+                : h.valor >= 400000 ? `<span class="tag-medio">🟡 Médio</span>`
+                : `<span class="tag-padrao">🟢 Padrão</span>`;
+      return `<tr>
+        <td><strong>${h.nome}</strong></td>
+        <td>${h.bairro}</td>
+        <td>${h.tipo}</td>
+        <td>${h.m2} m²</td>
+        <td><strong style="color:var(--green)">${fmt(h.valor)}</strong></td>
+        <td>${st}</td>
+        <td style="color:var(--muted);font-size:12px">${h.data}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  // Init
+  document.getElementById("data-contato").valueAsDate = new Date();
+</script>
+</body>
+</html>

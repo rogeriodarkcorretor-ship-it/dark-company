@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Imobiliária IA — Sua Equipe Completa (10 Especialistas)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #05080f;
+    --surface: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.07);
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --accent: #ff6b35;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated bg grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,107,53,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,107,53,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+  /* ── HEADER ── */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,8,15,0.92);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #ff6b35, #f97316);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 24px rgba(255,107,53,0.4);
+  }
+  .header-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; }
+  .header-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-status { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+  .pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #ff6b35;
+    animation: pulse 2s infinite;
+  }
+
+  /* ── LAYOUT ── */
+  .main { max-width: 980px; margin: 0 auto; padding: 28px 16px; position: relative; z-index: 1; }
+
+  /* ── HOME SCREEN ── */
+  #home { animation: fadeUp 0.4s ease; }
+  .hero { text-align: center; margin-bottom: 44px; }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.08;
+    margin-bottom: 14px;
+  }
+  .hero-title span {
+    background: linear-gradient(90deg, #ff6b35, #fb923c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { color: var(--muted); font-size: 15px; max-width: 460px; margin: 0 auto; line-height: 1.6; }
+
+  /* ── AGENT GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    cursor: pointer;
+    transition: transform 0.22s cubic-bezier(0.4,0,0.2,1), background 0.22s, box-shadow 0.22s, border-color 0.22s;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease both;
+  }
+  .agent-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--c) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .agent-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.055); }
+  .agent-card:hover::after { opacity: 0.06; }
+  .agent-card:hover { border-color: var(--c); box-shadow: 0 0 32px color-mix(in srgb, var(--c) 30%, transparent); }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+  .card-icon {
+    width: 50px; height: 50px;
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 25%, transparent);
+    border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .card-skill {
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 28%, transparent);
+    border-radius: 6px;
+    padding: 3px 9px;
+    font-size: 10px;
+    color: var(--c);
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 19px;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 2px 9px;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .card-cta { font-size: 13px; color: var(--c); font-weight: 500; }
+
+  /* ── STATS ── */
+  .stats {
+    display: flex; justify-content: center; gap: 0;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .stat {
+    flex: 1; text-align: center; padding: 22px 16px;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px; font-weight: 800;
+    color: #ff6b35; letter-spacing: -1px;
+  }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── CHAT SCREEN ── */
+  #chat { display: none; flex-direction: column; height: calc(100vh - 130px); animation: fadeUp 0.3s ease; }
+  #chat.active { display: flex; }
+
+  .chat-header {
+    display: flex; align-items: center; gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--chat-color, rgba(255,255,255,0.08));
+    margin-bottom: 16px;
+  }
+  .back-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+  .chat-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .chat-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; }
+  .chat-skill-lbl { font-size: 12px; margin-top: 1px; }
+  .online-badge { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .online-dot { width: 7px; height: 7px; border-radius: 50%; animation: pulse 2s infinite; }
+
+  /* messages */
+  .messages { flex: 1; overflow-y: auto; padding-right: 4px; }
+
+  .empty-state { text-align: center; padding-top: 36px; }
+  .empty-icon { font-size: 44px; margin-bottom: 14px; }
+  .empty-title { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+  .empty-sub { color: var(--muted); font-size: 13px; max-width: 380px; margin: 0 auto 26px; line-height: 1.6; }
+  .quick-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .quick-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 22px;
+    padding: 8px 15px;
+    color: #94a3b8;
+    font-size: 12.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .quick-btn:hover { background: rgba(255,255,255,0.08); color: #e2e8f0; }
+
+  .bubble-wrap { display: flex; margin-bottom: 14px; animation: fadeUp 0.3s ease; }
+  .bubble-wrap.user { justify-content: flex-end; }
+  .bubble-wrap.bot { justify-content: flex-start; }
+  .bubble {
+    max-width: 82%;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .bubble.user {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px 18px 4px 18px;
+    color: #e2e8f0;
+  }
+  .bubble.bot {
+    background: rgba(255,255,255,0.04);
+    border-radius: 18px 18px 18px 4px;
+    color: #e2e8f0;
+  }
+
+  .typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; }
+  .typing span {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* input */
+  .input-area {
+    margin-top: 16px;
+    border-radius: 16px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .input-area textarea {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e2e8f0;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    width: 100%;
+    line-height: 1.5;
+    min-height: 24px;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+  .input-area textarea::placeholder { color: #475569; }
+  .send-btn {
+    width: 44px; height: 44px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+  .send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .input-hint { text-align: center; margin-top: 8px; font-size: 11px; color: #1e3050; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.45; }
+  }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.55); opacity: 0.35; }
+    40%           { transform: scale(1); opacity: 1; }
+  }
+
+  /* stagger cards */
+  .agent-card:nth-child(1) { animation-delay: 0.04s; }
+  .agent-card:nth-child(2) { animation-delay: 0.08s; }
+  .agent-card:nth-child(3) { animation-delay: 0.12s; }
+  .agent-card:nth-child(4) { animation-delay: 0.16s; }
+  .agent-card:nth-child(5) { animation-delay: 0.20s; }
+  .agent-card:nth-child(6) { animation-delay: 0.24s; }
+  .agent-card:nth-child(7) { animation-delay: 0.28s; }
+  .agent-card:nth-child(8) { animation-delay: 0.32s; }
+  .agent-card:nth-child(9) { animation-delay: 0.36s; }
+  .agent-card:nth-child(10) { animation-delay: 0.40s; }
+
+  @media (max-width: 520px) {
+    .stats { flex-direction: column; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    .header { padding: 12px 16px; }
+    .main { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">🏠</div>
+    <div>
+      <div class="header-title">Imobiliária IA</div>
+      <div class="header-sub">Sua equipe completa com IA</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="pulse-dot"></div>
+    10 especialistas ativos
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="hero">
+      <div class="hero-title">Sua equipe completa,<br><span>sem contratar ninguém.</span></div>
+      <p class="hero-sub">10 especialistas em IA treinados para imobiliárias. Escolha um e comece agora.</p>
+    </div>
+
+    <div class="grid" id="agentGrid"></div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-val">10</div><div class="stat-lbl">Especialistas IA</div></div>
+      <div class="stat"><div class="stat-val">∞</div><div class="stat-lbl">Conversas</div></div>
+      <div class="stat"><div class="stat-val">24/7</div><div class="stat-lbl">Disponível</div></div>
+      <div class="stat"><div class="stat-val">PT‑BR</div><div class="stat-lbl">Em português</div></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat">
+    <div class="chat-header" id="chatHeader">
+      <button class="back-btn" onclick="goHome()">← Voltar</button>
+      <div class="chat-icon" id="chatIcon"></div>
+      <div>
+        <div class="chat-name" id="chatName"></div>
+        <div class="chat-skill-lbl" id="chatSkill"></div>
+      </div>
+      <div class="online-badge">
+        <div class="online-dot" id="onlineDot"></div>
+        online
+      </div>
+    </div>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="input-area" id="inputArea">
+      <textarea id="msgInput" rows="1" placeholder="Pergunte ao especialista…"
+        oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-hint">Enter para enviar · Shift+Enter para nova linha</div>
+  </div>
+
+</div>
+
+<script>
+const AGENTS = [
+  {
+    id: "copywriter",
+    label: "COPYWRITER",
+    skill: "copy_vendas.skill",
+    tags: ["descrições", "anúncios", "e-mails"],
+    icon: "✍️",
+    color: "#00e5b4",
+    system: `Você é um copywriter especialista em imóveis brasileiros. Crie textos persuasivos e profissionais para imobiliárias: descrições de imóveis, e-mails para clientes, anúncios para portais (ZAP, Viva Real, OLX) e redes sociais. Use linguagem que gera desejo e urgência, destaque os diferenciais do imóvel. Responda sempre em português do Brasil.`,
+    prompts: ["Descrição de imóvel para portal", "E-mail de captação de proprietário", "Anúncio para Instagram", "E-mail de follow-up para cliente"],
+  },
+  {
+    id: "trafego",
+    label: "TRÁFEGO",
+    skill: "campanha_trafego.skill",
+    tags: ["Meta Ads", "Google Ads", "leads"],
+    icon: "📣",
+    color: "#3b82f6",
+    system: `Você é um especialista em tráfego pago para imobiliárias. Crie estratégias de campanhas no Meta Ads e Google Ads focadas em captação de leads qualificados para compra, venda e locação de imóveis. Defina público-alvo, copywriting dos anúncios, segmentações, verba sugerida e métricas. Responda em português do Brasil.`,
+    prompts: ["Campanha para captação de compradores", "Estratégia de remarketing", "Segmentação para alto padrão", "Campanha de aluguel residencial"],
+  },
+  {
+    id: "juridico",
+    label: "JURÍDICO",
+    skill: "juridico_imoveis.skill",
+    tags: ["contratos", "CRECI", "documentação"],
+    icon: "⚖️",
+    color: "#f59e0b",
+    system: `Você é um consultor jurídico especializado em direito imobiliário brasileiro. Auxilie com contratos de compra e venda, contratos de locação, due diligence, ITBI, registro de imóveis, promessa de compra e venda, rescisões, procurações e documentação. Sempre indique quando é necessário consultar um advogado. Responda em português do Brasil.`,
+    prompts: ["Checklist de documentos para compra", "Cláusulas de contrato de locação", "O que é due diligence imobiliária?", "Rescisão de contrato de compra e venda"],
+  },
+  {
+    id: "designer",
+    label: "DESIGNER",
+    skill: "design_imoveis.skill",
+    tags: ["briefing", "identidade", "posts"],
+    icon: "🎨",
+    color: "#ec4899",
+    system: `Você é um designer estratégico especializado em imobiliárias. Crie briefings detalhados, sugira paletas de cores, identidade visual, layout de materiais (placas, folders, cartões), roteiros de vídeos para imóveis, scripts para tours virtuais e orientações de produção de fotos. Responda em português do Brasil com descrições visuais detalhadas e criativas.`,
+    prompts: ["Briefing de identidade visual", "Roteiro de vídeo de imóvel", "Layout de placa de venda/locação", "Post para redes sociais"],
+  },
+  {
+    id: "financeiro",
+    label: "FINANCEIRO",
+    skill: "financeiro_imoveis.skill",
+    tags: ["precificação", "comissão", "fluxo"],
+    icon: "💰",
+    color: "#22c55e",
+    system: `Você é um CFO e consultor financeiro especializado em imobiliárias. Auxilie com precificação de imóveis, cálculo de comissões, fluxo de caixa, análise de investimento (ROI, cap rate), simulação de financiamento, comparativo de fundos imobiliários e métricas de performance. Responda em português do Brasil com dados e cálculos claros.`,
+    prompts: ["Calcular cap rate e ROI", "Simulação de financiamento", "Modelo de comissão para corretores", "Métricas financeiras da imobiliária"],
+  },
+  {
+    id: "socialmedia",
+    label: "SOCIAL MEDIA",
+    skill: "conteudo_editorial.skill",
+    tags: ["roteiro", "calendário", "posts"],
+    icon: "📱",
+    color: "#a855f7",
+    system: `Você é um especialista em social media para imobiliárias. Crie calendários editoriais, legendas para Instagram/Facebook/TikTok, roteiros de Reels, estratégias de conteúdo, hashtags relevantes e scripts para stories. Foque em conteúdo que gera engajamento, autoridade e leads. Responda em português do Brasil.`,
+    prompts: ["Calendário editorial mensal", "Legenda para post de imóvel", "Roteiro de Reels para imobiliária", "Estratégia de conteúdo no TikTok"],
+  },
+  {
+    id: "avaliacao",
+    label: "AVALIAÇÃO",
+    skill: "avaliacao_imovel.skill",
+    tags: ["preço", "mercado", "CMA"],
+    icon: "🏗️",
+    color: "#f43f5e",
+    system: `Você é um especialista em avaliação e precificação de imóveis no mercado brasileiro. Auxilie com estimativa de valor de mercado, análise comparativa de imóveis (CMA), avaliação por metro quadrado por região, fatores que valorizam ou desvalorizam um imóvel, técnicas de precificação estratégica para venda rápida, laudo de avaliação e como argumentar o preço com proprietários. Use dados e metodologias sólidas. Responda em português do Brasil.`,
+    prompts: ["Como precificar um apartamento para vender rápido", "Fatores que mais valorizam um imóvel", "Como fazer uma análise comparativa de mercado", "Argumentos para convencer dono a baixar o preço"],
+  },
+  {
+    id: "corretores",
+    label: "GESTÃO DE EQUIPE",
+    skill: "gestao_corretores.skill",
+    tags: ["treinamento", "metas", "scripts"],
+    icon: "👥",
+    color: "#06b6d4",
+    system: `Você é um especialista em gestão e treinamento de equipes de corretores de imóveis. Crie scripts de atendimento ao cliente, materiais de treinamento, estruturas de metas e comissões, playbooks de vendas, checklists de visita, argumentos de contorno de objeções, planos de onboarding para novos corretores e indicadores de performance (KPIs). Responda em português do Brasil de forma prática e aplicável.`,
+    prompts: ["Script de abordagem ao cliente", "Plano de metas para corretores", "Como contornar objeção de preço", "Checklist de visita ao imóvel"],
+  },
+  {
+    id: "sdr",
+    label: "SDR / LEADS",
+    skill: "pre_atendimento.skill",
+    tags: ["WhatsApp", "qualificação", "CRM"],
+    icon: "📞",
+    color: "#84cc16",
+    system: `Você é um especialista em pré-atendimento, qualificação de leads e SDR (Sales Development Representative) para imobiliárias. Crie scripts para WhatsApp, roteiros de qualificação de leads, mensagens de follow-up, fluxos de cadência de contato, templates para CRM, respostas para dúvidas frequentes e estratégias para converter leads frios em visitas agendadas. Responda em português do Brasil com mensagens prontas para usar.`,
+    prompts: ["Script de primeiro contato pelo WhatsApp", "Fluxo de cadência para leads frios", "Perguntas para qualificar lead comprador", "Mensagem de follow-up após visita"],
+  },
+  {
+    id: "mercado",
+    label: "PESQUISA DE MERCADO",
+    skill: "mercado_imobiliario.skill",
+    tags: ["análise", "concorrência", "tendências"],
+    icon: "🔍",
+    color: "#fb923c",
+    system: `Você é um analista de mercado imobiliário brasileiro. Auxilie com análise de concorrência, tendências do setor, interpretação de dados de mercado, identificação de nichos e oportunidades, análise de bairros e regiões em valorização, benchmark de imobiliárias, dados de FipeZap, SECOVI e CRECI, e estratégias de posicionamento competitivo. Responda em português do Brasil com análises embasadas e objetivas.`,
+    prompts: ["Como analisar concorrentes na minha região", "Bairros que mais valorizam em 2025", "Como identificar nichos lucrativos", "Análise de tendências do mercado imobiliário"],
+  },
+];
+
+let currentAgent = null;
+let chatHistory = {};
+let isLoading = false;
+
+// Build cards
+const grid = document.getElementById('agentGrid');
+AGENTS.forEach(ag => {
+  const card = document.createElement('div');
+  card.className = 'agent-card';
+  card.style.setProperty('--c', ag.color);
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-icon">${ag.icon}</div>
+      <div class="card-skill">${ag.skill}</div>
+    </div>
+    <div class="card-name">${ag.label}</div>
+    <div class="card-tags">${ag.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="card-cta">Conversar com especialista →</div>
+  `;
+  card.onclick = () => openChat(ag);
+  grid.appendChild(card);
+});
+
+function openChat(ag) {
+  currentAgent = ag;
+  document.getElementById('home').style.display = 'none';
+  const chat = document.getElementById('chat');
+  chat.classList.add('active');
+
+  // header
+  const chatIcon = document.getElementById('chatIcon');
+  chatIcon.textContent = ag.icon;
+  chatIcon.style.background = `${ag.color}18`;
+  chatIcon.style.border = `1px solid ${ag.color}35`;
+
+  document.getElementById('chatName').textContent = ag.label;
+  const skillLbl = document.getElementById('chatSkill');
+  skillLbl.textContent = ag.skill;
+  skillLbl.style.color = ag.color;
+
+  document.getElementById('onlineDot').style.background = ag.color;
+
+  const header = document.getElementById('chatHeader');
+  header.style.borderBottomColor = `${ag.color}30`;
+
+  const inputArea = document.getElementById('inputArea');
+  inputArea.style.background = 'rgba(255,255,255,0.04)';
+  inputArea.style.border = `1px solid ${ag.color}40`;
+  inputArea.style.boxShadow = `0 0 30px ${ag.color}15`;
+
+  document.getElementById('sendBtn').style.background = ag.color;
+
+  renderMessages();
+  document.getElementById('msgInput').focus();
+}
+
+function goHome() {
+  currentAgent = null;
+  document.getElementById('chat').classList.remove('active');
+  document.getElementById('home').style.display = '';
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('msgInput').value = '';
+  document.getElementById('sendBtn').disabled = true;
+}
+
+function renderMessages() {
+  const ag = currentAgent;
+  const msgs = chatHistory[ag.id] || [];
+  const container = document.getElementById('messages');
+  container.innerHTML = '';
+
+  if (msgs.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${ag.icon}</div>
+        <div class="empty-title">Especialista em ${ag.label}</div>
+        <p class="empty-sub">Faça sua pergunta ou use um dos atalhos abaixo para começar.</p>
+        <div class="quick-list">
+          ${ag.prompts.map(p => `<button class="quick-btn" onclick="quickSend('${p.replace(/'/g, "\\'")}')">${p}</button>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
+  msgs.forEach(m => appendBubble(m.role, m.content, false));
+  scrollBottom();
+}
+
+function appendBubble(role, content, animate = true) {
+  const container = document.getElementById('messages');
+  // Remove empty state
+  const es = container.querySelector('.empty-state');
+  if (es) es.remove();
+
+  const wrap = document.createElement('div');
+  wrap.className = `bubble-wrap ${role === 'user' ? 'user' : 'bot'}`;
+  if (!animate) wrap.style.animation = 'none';
+
+  const bubble = document.createElement('div');
+  bubble.className = `bubble ${role === 'user' ? 'user' : 'bot'}`;
+  if (role === 'assistant') {
+    bubble.style.border = `1px solid ${currentAgent.color}35`;
+    bubble.style.boxShadow = `0 0 18px ${currentAgent.color}12`;
+  }
+  bubble.textContent = content;
+  wrap.appendChild(bubble);
+  container.appendChild(wrap);
+  scrollBottom();
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-wrap bot';
+  wrap.id = 'typingIndicator';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble bot';
+  bubble.style.border = `1px solid ${currentAgent.color}35`;
+  bubble.style.padding = '0';
+  bubble.innerHTML = `<div class="typing">
+    <span style="background:${currentAgent.color}"></span>
+    <span style="background:${currentAgent.color}"></span>
+    <span style="background:${currentAgent.color}"></span>
+  </div>`;
+  wrap.appendChild(bubble);
+  container.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+function scrollBottom() {
+  const c = document.getElementById('messages');
+  c.scrollTop = c.scrollHeight;
+}
+
+async function sendMessage(text) {
+  if (isLoading) return;
+  const input = document.getElementById('msgInput');
+  const msg = (text || input.value).trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  const ag = currentAgent;
+  if (!chatHistory[ag.id]) chatHistory[ag.id] = [];
+  chatHistory[ag.id].push({ role: 'user', content: msg });
+  appendBubble('user', msg);
+
+  isLoading = true;
+  showTyping();
+
+  try {
+    const apiMessages = chatHistory[ag.id].map(m => ({ role: m.role, content: m.content }));
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: ag.system,
+        messages: apiMessages,
+      }),
+    });
+    const data = await res.json();
+    const reply = (data.content || []).map(b => b.text || '').join('') || 'Não consegui gerar uma resposta.';
+    chatHistory[ag.id].push({ role: 'assistant', content: reply });
+    removeTyping();
+    appendBubble('assistant', reply);
+  } catch (e) {
+    removeTyping();
+    appendBubble('assistant', '⚠️ Erro ao conectar com a IA. Verifique sua conexão e tente novamente.');
+  }
+
+  isLoading = false;
+}
+
+function quickSend(text) { sendMessage(text); }
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  document.getElementById('sendBtn').disabled = !el.value.trim();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+</script>
+</body>
+</html>

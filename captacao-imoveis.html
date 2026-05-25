@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seu Imóvel em Boas Mãos | Piracicaba</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --sand: #E8DCC8;
+    --terra: #C4884A;
+    --terra-dark: #9B6535;
+    --charcoal: #2A2520;
+    --mid: #6B5F54;
+    --white: #FDFAF5;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    background: var(--charcoal);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 64px 80px 72px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-left::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: 0; bottom: 0;
+    width: 80px;
+    background: var(--charcoal);
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    z-index: 3;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(196,136,74,0.15);
+    border: 1px solid rgba(196,136,74,0.4);
+    color: var(--terra);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 36px;
+    width: fit-content;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge::before { content: '●'; font-size: 8px; }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5vw, 58px);
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 24px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--terra);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: #A89A8D;
+    line-height: 1.7;
+    max-width: 380px;
+    margin-bottom: 48px;
+    font-weight: 300;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--terra);
+    color: var(--white);
+    padding: 18px 36px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.2s;
+    width: fit-content;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .hero-cta:hover { background: var(--terra-dark); transform: translateY(-2px); }
+  .hero-cta svg { transition: transform 0.2s; }
+  .hero-cta:hover svg { transform: translateX(4px); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-right img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.75) saturate(0.9);
+    animation: zoomIn 1.2s ease both;
+  }
+
+  .hero-right::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(196,136,74,0.3) 0%, transparent 60%);
+  }
+
+  .stats-bar {
+    position: absolute;
+    bottom: 40px; left: 40px;
+    right: 40px;
+    display: flex;
+    gap: 1px;
+    z-index: 10;
+  }
+
+  .stat {
+    background: rgba(253,250,245,0.9);
+    backdrop-filter: blur(12px);
+    padding: 20px 28px;
+    flex: 1;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+
+  .stat:first-child { border-radius: 8px 0 0 8px; }
+  .stat:last-child { border-radius: 0 8px 8px 0; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--terra);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--mid);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 100px 0; }
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 40px; }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--terra);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.2;
+    color: var(--charcoal);
+    margin-bottom: 20px;
+  }
+
+  .section-body {
+    font-size: 16px;
+    color: var(--mid);
+    line-height: 1.75;
+    font-weight: 300;
+    max-width: 520px;
+  }
+
+  /* ── POR QUE EU ── */
+  .why {
+    background: var(--white);
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .why-cards {
+    display: grid;
+    gap: 16px;
+  }
+
+  .why-card {
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .why-card:hover { border-color: var(--terra); transform: translateX(6px); }
+
+  .why-icon {
+    width: 48px; height: 48px;
+    background: var(--charcoal);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--terra);
+    font-size: 20px;
+  }
+
+  .why-card h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+  }
+
+  .why-card p {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── COMO FUNCIONA ── */
+  .how { background: var(--charcoal); }
+  .how .section-title { color: var(--white); }
+  .how .section-eyebrow { color: var(--terra); }
+  .how .section-body { color: #A89A8D; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+
+  .step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 40px 32px;
+    border-radius: 4px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .step:hover { background: rgba(255,255,255,0.07); }
+
+  .step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px;
+    color: rgba(196,136,74,0.2);
+    line-height: 1;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .step h3 {
+    font-size: 16px;
+    color: var(--white);
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .step p {
+    font-size: 13px;
+    color: #7A6E65;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── FORMULÁRIO ── */
+  .form-section {
+    background: var(--cream);
+  }
+
+  .form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .form-info {}
+
+  .promise-list {
+    margin-top: 40px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .promise-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: var(--mid);
+  }
+
+  .promise-item::before {
+    content: '✓';
+    width: 28px; height: 28px;
+    background: var(--terra);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .card-form {
+    background: var(--white);
+    border: 1px solid var(--sand);
+    border-radius: 16px;
+    padding: 48px;
+    box-shadow: 0 20px 60px rgba(42,37,32,0.08);
+  }
+
+  .card-form h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--charcoal);
+    margin-bottom: 8px;
+  }
+
+  .card-form .sub {
+    font-size: 14px;
+    color: var(--mid);
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1.5px solid var(--sand);
+    border-radius: 8px;
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--charcoal);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--terra);
+    background: var(--white);
+  }
+
+  textarea { resize: vertical; min-height: 100px; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--terra);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .submit-btn:hover { background: var(--terra-dark); transform: translateY(-2px); }
+
+  .whatsapp-alt {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--mid);
+  }
+
+  .whatsapp-alt a {
+    color: #25D366;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ── SUCCESS ── */
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .success-msg.show { display: block; }
+
+  .success-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+  }
+
+  .success-msg h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--charcoal);
+    margin-bottom: 12px;
+  }
+
+  .success-msg p {
+    color: var(--mid);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--charcoal);
+    padding: 48px 0;
+    text-align: center;
+  }
+
+  footer p {
+    color: #5A4E45;
+    font-size: 13px;
+  }
+
+  footer strong { color: var(--terra); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoomIn {
+    from { transform: scale(1.06); }
+    to   { transform: scale(1); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 80px 40px 60px; }
+    .hero-left::after { display: none; }
+    .hero-right { height: 380px; }
+    .why-grid, .form-layout { grid-template-columns: 1fr; gap: 48px; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .stats-bar { flex-direction: column; }
+    .stat:first-child { border-radius: 8px 8px 0 0; }
+    .stat:last-child { border-radius: 0 0 8px 8px; }
+    .card-form { padding: 32px 24px; }
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 64px 0; }
+    .steps { grid-template-columns: 1fr; }
+    .hero-left { padding: 64px 24px 48px; }
+    .container { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="badge">Corretor em Piracicaba</div>
+    <h1 class="hero-title">
+      Seu imóvel merece<br>
+      <em>cuidado de verdade</em>
+    </h1>
+    <p class="hero-sub">
+      Há anos atuando no mercado imobiliário de Piracicaba, ajudo proprietários a valorizarem, alugar ou vender seus imóveis com segurança, transparência e resultados reais.
+    </p>
+    <a href="#formulario" class="hero-cta">
+      Quero cadastrar meu imóvel
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-right">
+    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=80" alt="Imóvel em Piracicaba">
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num">+200</div>
+        <div class="stat-label">Imóveis negociados</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">12+</div>
+        <div class="stat-label">Anos de experiência</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Clientes satisfeitos</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POR QUE EU -->
+<section class="why">
+  <div class="container">
+    <div class="why-grid">
+      <div>
+        <p class="section-eyebrow">Por que trabalhar comigo</p>
+        <h2 class="section-title">Seu imóvel nas mãos certas, na cidade certa</h2>
+        <p class="section-body">Conheço Piracicaba como ninguém. Cada bairro, cada perfil de comprador e locatário. Isso significa anúncios certeiros, menos tempo esperando e mais retorno para você.</p>
+      </div>
+      <div class="why-cards">
+        <div class="why-card">
+          <div class="why-icon">📍</div>
+          <div>
+            <h3>Especialista local em Piracicaba</h3>
+            <p>Conheço todos os bairros, valores de mercado e a demanda real da cidade — sem achismos.</p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">📢</div>
+          <div>
+            <h3>Divulgação em múltiplos canais</h3>
+            <p>ZAP Imóveis, OLX, Instagram, grupos locais e uma carteira ativa de interessados qualificados.</p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🔒</div>
+          <div>
+            <h3>Segurança jurídica total</h3>
+            <p>Contratos revisados, análise de crédito e toda a burocracia cuidada por mim para você.</p>
+          </div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">💬</div>
+          <div>
+            <h3>Atendimento próximo e transparente</h3>
+            <p>Você sempre sabe o que está acontecendo com seu imóvel. Sem enrolação, sem sumiço.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="how">
+  <div class="container">
+    <p class="section-eyebrow">Como funciona</p>
+    <h2 class="section-title">Simples assim</h2>
+    <p class="section-body">Do primeiro contato até a assinatura, cuido de tudo para que você não precise se preocupar com nada.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Você preenche o formulário</h3>
+        <p>Deixa os dados do seu imóvel aqui mesmo. Leva menos de 2 minutos.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Entro em contato em até 24h</h3>
+        <p>Agendo uma visita para avaliar o imóvel e conversar sobre seus objetivos.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Anunciamos com qualidade</h3>
+        <p>Fotos profissionais, descrição atraente e divulgação nos melhores canais.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Fechamos o negócio</h3>
+        <p>Cuido da negociação, documentação e assinatura. Você só comemora.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULÁRIO -->
+<section class="form-section" id="formulario">
+  <div class="container">
+    <div class="form-layout">
+      <div class="form-info">
+        <p class="section-eyebrow">Cadastre seu imóvel</p>
+        <h2 class="section-title">Vamos conversar sobre o seu imóvel?</h2>
+        <p class="section-body">Preencha ao lado e eu entro em contato para uma avaliação gratuita e sem compromisso.</p>
+        <div class="promise-list">
+          <div class="promise-item">Avaliação de mercado gratuita</div>
+          <div class="promise-item">Sem exclusividade obrigatória</div>
+          <div class="promise-item">Comissão só no fechamento</div>
+          <div class="promise-item">Atendo locação e venda</div>
+          <div class="promise-item">Piracicaba e região</div>
+        </div>
+      </div>
+
+      <div class="card-form" id="form-card">
+        <div id="form-content">
+          <h3>Cadastro do imóvel</h3>
+          <p class="sub">Sem compromisso — só queremos conhecer seu imóvel.</p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Seu nome *</label>
+              <input type="text" id="nome" placeholder="João Silva">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp *</label>
+              <input type="tel" id="telefone" placeholder="(19) 99999-9999">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo do imóvel *</label>
+            <select id="tipo">
+              <option value="">Selecione...</option>
+              <option>Casa</option>
+              <option>Apartamento</option>
+              <option>Terreno</option>
+              <option>Comercial (sala/loja)</option>
+              <option>Chácara / Sítio</option>
+              <option>Outro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Objetivo *</label>
+            <select id="objetivo">
+              <option value="">Selecione...</option>
+              <option>Quero alugar</option>
+              <option>Quero vender</option>
+              <option>Alugar ou vender (ambos)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Bairro / Região em Piracicaba</label>
+            <input type="text" id="bairro" placeholder="Ex: Santa Cruz, Centro, Paulicéia...">
+          </div>
+
+          <div class="form-group">
+            <label>Conte um pouco sobre o imóvel</label>
+            <textarea id="descricao" placeholder="Quartos, metragem, diferenciais, valor desejado..."></textarea>
+          </div>
+
+          <button class="submit-btn" onclick="enviarFormulario()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            Quero ser contactado
+          </button>
+
+          <div class="whatsapp-alt">
+            Prefere falar agora?
+            <a href="https://wa.me/5519999999999?text=Olá!%20Tenho%20um%20imóvel%20em%20Piracicaba%20e%20gostaria%20de%20uma%20avaliação." target="_blank">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.089.537 4.049 1.475 5.757L.057 23.157a.75.75 0 00.914.914l5.4-1.418A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22.5a10.441 10.441 0 01-5.33-1.455l-.382-.228-3.96 1.04 1.04-3.96-.228-.382A10.441 10.441 0 011.5 12C1.5 6.201 6.201 1.5 12 1.5S22.5 6.201 22.5 12 17.799 22.5 12 22.5z"/></svg>
+              Chamar no WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <div class="success-msg" id="success">
+          <div class="success-icon">🏡</div>
+          <h3>Recebido com sucesso!</h3>
+          <p>Obrigado, <strong id="nome-confirmacao"></strong>!<br>Entrarei em contato em até 24 horas pelo seu WhatsApp para conversarmos sobre o seu imóvel.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Corretor de Imóveis em <strong>Piracicaba, SP</strong> — CRECI ativo &nbsp;|&nbsp; Atendimento via WhatsApp e presencial</p>
+</footer>
+
+<script>
+  function enviarFormulario() {
+    const nome = document.getElementById('nome').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const tipo = document.getElementById('tipo').value;
+    const objetivo = document.getElementById('objetivo').value;
+
+    if (!nome || !telefone || !tipo || !objetivo) {
+      alert('Por favor, preencha os campos obrigatórios: Nome, WhatsApp, Tipo e Objetivo.');
+      return;
+    }
+
+    // Monta mensagem para WhatsApp
+    const bairro = document.getElementById('bairro').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+
+    let msg = `Olá! Tenho interesse em cadastrar meu imóvel.\n\n`;
+    msg += `👤 *Nome:* ${nome}\n`;
+    msg += `📱 *WhatsApp:* ${telefone}\n`;
+    msg += `🏠 *Tipo:* ${tipo}\n`;
+    msg += `🎯 *Objetivo:* ${objetivo}\n`;
+    if (bairro) msg += `📍 *Bairro:* ${bairro}\n`;
+    if (descricao) msg += `📝 *Detalhes:* ${descricao}\n`;
+
+    const encodedMsg = encodeURIComponent(msg);
+    const whatsappUrl = `https://wa.me/5519999999999?text=${encodedMsg}`;
+
+    // Abre WhatsApp
+    window.open(whatsappUrl, '_blank');
+
+    // Mostra confirmação
+    document.getElementById('nome-confirmacao').textContent = nome.split(' ')[0];
+    document.getElementById('form-content').style.display = 'none';
+    document.getElementById('success').classList.add('show');
+  }
+
+  // Máscara de telefone
+  document.getElementById('telefone').addEventListener('input', function(e) {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length <= 11) {
+      v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+      v = v.replace(/(\d{5})(\d)/, '$1-$2');
+    }
+    e.target.value = v;
+  });
+
+  // Scroll suave highlight
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>

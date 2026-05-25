@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Venda seu Imóvel em Piracicaba · Dark Company</title>
+  <meta name="description" content="Avaliação gratuita, visita sem compromisso e venda rápida garantida. Dark Company Negócios Imobiliários — Piracicaba."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Syne:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#08080a;
+      --s1:#0f0f12;
+      --s2:#16161a;
+      --s3:#1c1c22;
+      --b1:#222228;
+      --b2:#2e2e36;
+      --muted:#5a5a6e;
+      --sub:#8888a0;
+      --text:#c8c8dc;
+      --white:#f0f0f8;
+      --gold:#c9a84c;
+      --gold2:#e8c96a;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--white);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+
+    /* NOISE OVERLAY */
+    body::after{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity:0.35;
+    }
+
+    /* DIAGONAL BG LINES */
+    body::before{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:repeating-linear-gradient(
+        -45deg,
+        transparent,transparent 40px,
+        rgba(201,168,76,0.018) 40px,rgba(201,168,76,0.018) 41px
+      );
+    }
+
+    .wrap{max-width:1080px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+
+    /* ─── HEADER ─── */
+    header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      padding:18px 32px;display:flex;align-items:center;justify-content:space-between;
+      background:rgba(8,8,10,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(201,168,76,0.12);
+    }
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;letter-spacing:0.06em;color:var(--gold)}
+    .logo span{color:var(--sub);font-weight:400;font-size:0.85rem;display:block;letter-spacing:0.1em}
+    .header-badge{
+      font-size:0.72rem;color:var(--gold);border:1px solid rgba(201,168,76,0.3);
+      border-radius:99px;padding:5px 14px;letter-spacing:0.08em;
+    }
+
+    /* ─── HERO ─── */
+    .hero{
+      min-height:100vh;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;text-align:center;
+      padding:120px 24px 80px;
+    }
+    .hero-label{
+      font-size:0.72rem;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;
+      margin-bottom:28px;opacity:0;animation:fadeUp 0.8s ease 0.2s forwards;
+    }
+    .hero h1{
+      font-family:'Cormorant Garamond',serif;
+      font-size:clamp(2.8rem,7vw,5.5rem);
+      font-weight:700;line-height:1.05;letter-spacing:-0.01em;
+      margin-bottom:24px;
+      opacity:0;animation:fadeUp 0.9s ease 0.35s forwards;
+    }
+    .hero h1 em{color:var(--gold);font-style:normal}
+    .hero p{
+      font-size:clamp(1rem,2vw,1.15rem);color:var(--sub);
+      max-width:540px;line-height:1.7;margin:0 auto 40px;
+      opacity:0;animation:fadeUp 0.9s ease 0.5s forwards;
+    }
+    .hero-ctas{
+      display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+      opacity:0;animation:fadeUp 0.9s ease 0.65s forwards;
+    }
+    .btn-gold{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#08080a;border:none;border-radius:12px;
+      padding:16px 32px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;
+      cursor:pointer;letter-spacing:0.02em;
+      transition:transform 0.18s,box-shadow 0.18s;
+      box-shadow:0 0 0 0 rgba(201,168,76,0.3);
+      animation:goldPulse 3s ease-in-out infinite;
+    }
+    .btn-gold:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(201,168,76,0.25)}
+    .btn-ghost{
+      background:transparent;color:var(--text);
+      border:1px solid var(--b2);border-radius:12px;
+      padding:15px 28px;font-family:'Syne',sans-serif;font-weight:500;font-size:0.95rem;
+      cursor:pointer;letter-spacing:0.02em;transition:border-color 0.2s,transform 0.18s;
+    }
+    .btn-ghost:hover{border-color:var(--gold);transform:translateY(-2px)}
+
+    @keyframes goldPulse{
+      0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.2)}
+      50%{box-shadow:0 0 32px 6px rgba(201,168,76,0.12)}
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(24px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* SCROLL ARROW */
+    .scroll-hint{
+      position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+      color:var(--muted);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      animation:float 2.5s ease-in-out infinite;
+    }
+    @keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
+    .scroll-hint::after{content:'↓';font-size:1rem}
+
+    /* ─── PROVAS ─── */
+    .proofs{
+      display:flex;gap:0;border:1px solid var(--b1);border-radius:20px;
+      overflow:hidden;margin:0 0 80px;
+    }
+    .proof{
+      flex:1;padding:28px 24px;text-align:center;
+      border-right:1px solid var(--b1);transition:background 0.2s;
+    }
+    .proof:last-child{border-right:none}
+    .proof:hover{background:var(--s1)}
+    .proof-num{
+      font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;
+      color:var(--gold);line-height:1;margin-bottom:6px;
+    }
+    .proof-label{font-size:0.8rem;color:var(--sub);letter-spacing:0.05em}
+
+    /* ─── OFERTAS ─── */
+    .section-label{font-size:0.72rem;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;margin-bottom:12px;line-height:1.15}
+    .section-sub{color:var(--sub);font-size:0.95rem;line-height:1.7;margin-bottom:48px;max-width:480px}
+
+    .offers{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:80px}
+    .offer{
+      background:var(--s1);border:1px solid var(--b1);border-radius:20px;
+      padding:32px 28px;transition:border-color 0.25s,transform 0.25s,background 0.25s;
+      position:relative;overflow:hidden;
+    }
+    .offer:hover{border-color:rgba(201,168,76,0.35);transform:translateY(-4px);background:var(--s2)}
+    .offer.featured{border-color:rgba(201,168,76,0.4);background:linear-gradient(145deg,var(--s2),var(--s1))}
+    .offer-icon{font-size:2rem;margin-bottom:20px}
+    .offer h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;margin-bottom:10px}
+    .offer p{color:var(--sub);font-size:0.88rem;line-height:1.6}
+    .offer-badge{
+      position:absolute;top:20px;right:20px;
+      background:var(--gold);color:#08080a;
+      font-size:0.65rem;font-weight:700;letter-spacing:0.08em;
+      border-radius:99px;padding:4px 10px;
+    }
+
+    /* ─── COMO FUNCIONA ─── */
+    .how{margin-bottom:80px}
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px;position:relative}
+    .step{
+      background:var(--s1);border:1px solid var(--b1);
+      padding:32px 24px;position:relative;
+      transition:background 0.25s,border-color 0.25s;
+    }
+    .step:hover{background:var(--s2);border-color:var(--b2)}
+    .step:first-child{border-radius:20px 0 0 20px}
+    .step:last-child{border-radius:0 20px 20px 0}
+    .step-n{
+      font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;
+      color:rgba(201,168,76,0.15);line-height:1;margin-bottom:16px;
+    }
+    .step h4{font-size:0.95rem;font-weight:700;margin-bottom:8px;color:var(--white)}
+    .step p{font-size:0.83rem;color:var(--sub);line-height:1.6}
+
+    /* ─── FORM ─── */
+    .form-section{margin-bottom:80px}
+    .form-wrap{
+      background:var(--s1);border:1px solid var(--b1);border-radius:24px;
+      display:grid;grid-template-columns:1fr 1fr;overflow:hidden;
+    }
+    .form-left{
+      padding:48px 40px;
+      background:linear-gradient(145deg,var(--s2),var(--s1));
+      border-right:1px solid var(--b1);
+    }
+    .form-left h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;margin-bottom:10px;line-height:1.2}
+    .form-left p{color:var(--sub);font-size:0.9rem;line-height:1.6;margin-bottom:32px}
+    .guarantee{display:flex;flex-direction:column;gap:14px}
+    .g-item{display:flex;align-items:flex-start;gap:12px}
+    .g-icon{color:var(--gold);font-size:1rem;margin-top:1px;flex-shrink:0}
+    .g-text{font-size:0.85rem;color:var(--sub);line-height:1.5}
+    .g-text strong{color:var(--text);display:block;margin-bottom:2px;font-size:0.88rem}
+
+    .form-right{padding:48px 40px;position:relative;overflow:hidden}
+    .fields{display:flex;flex-direction:column;gap:14px}
+    input,textarea,select{
+      width:100%;background:var(--s3);border:1.5px solid var(--b1);
+      border-radius:12px;padding:15px 18px;
+      color:var(--white);font-family:'Syne',sans-serif;font-size:0.9rem;outline:none;
+      transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;appearance:none;
+    }
+    input::placeholder,textarea::placeholder{color:var(--muted)}
+    input:focus,textarea:focus,select:focus{
+      border-color:rgba(201,168,76,0.5);
+      box-shadow:0 0 0 3px rgba(201,168,76,0.08);
+    }
+    .field-error{border-color:#ef4444!important}
+    .error-msg{color:#f87171;font-size:0.78rem;margin-top:4px;display:none}
+    .error-msg.show{display:block}
+    textarea{min-height:90px;resize:vertical}
+    select option{background:var(--s3);color:var(--white)}
+
+    .btn-submit{
+      width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#08080a;border:none;border-radius:12px;padding:18px;
+      font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;
+      cursor:pointer;letter-spacing:0.03em;margin-top:4px;
+      transition:transform 0.18s,box-shadow 0.18s;
+    }
+    .btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(201,168,76,0.2)}
+    .btn-submit:active{transform:scale(0.98)}
+    .form-note{text-align:center;color:var(--muted);font-size:0.75rem;margin-top:8px}
+
+    @keyframes shake{
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-7px)}40%{transform:translateX(7px)}
+      60%{transform:translateX(-5px)}80%{transform:translateX(5px)}
+    }
+    .shake{animation:shake 0.5s ease!important}
+
+    @keyframes popIn{
+      0%{transform:scale(0.75);opacity:0}
+      60%{transform:scale(1.05)}
+      100%{transform:scale(1);opacity:1}
+    }
+    .success-overlay{
+      display:none;position:absolute;inset:0;
+      background:var(--s1);border-radius:0 24px 24px 0;
+      flex-direction:column;align-items:center;justify-content:center;
+      gap:14px;text-align:center;padding:32px;
+      animation:popIn 0.5s ease forwards;
+    }
+    .success-overlay.show{display:flex}
+    .s-icon{font-size:3.5rem}
+    .s-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--gold)}
+    .s-sub{color:var(--sub);font-size:0.9rem;max-width:260px;line-height:1.6}
+
+    /* ─── FOOTER ─── */
+    footer{
+      border-top:1px solid var(--b1);padding:40px 24px;text-align:center;
+      color:var(--muted);font-size:0.82rem;
+    }
+    footer strong{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1rem}
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.8s ease,transform 0.8s ease}
+    .reveal.visible{opacity:1;transform:none}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:700px){
+      .form-wrap{grid-template-columns:1fr}
+      .form-left{border-right:none;border-bottom:1px solid var(--b1);padding:32px 24px}
+      .form-right{padding:32px 24px}
+      .step:first-child{border-radius:20px 20px 0 0}
+      .step:last-child{border-radius:0 0 20px 20px}
+      .proofs{flex-direction:column}
+      .proof{border-right:none;border-bottom:1px solid var(--b1)}
+      .proof:last-child{border-bottom:none}
+      .success-overlay{border-radius:0 0 24px 24px}
+      header{padding:14px 20px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    Dark Company
+    <span>Negócios Imobiliários · Piracicaba</span>
+  </div>
+  <div class="header-badge">📍 Piracicaba</div>
+</header>
+
+<!-- HERO -->
+<section class="hero" style="position:relative">
+  <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
+    <div class="hero-label">Dark Company Negócios Imobiliários</div>
+    <h1>Quer vender seu<br>imóvel em<br><em>Piracicaba?</em></h1>
+    <p>Fazemos uma avaliação gratuita, visitamos sem compromisso e apresentamos compradores qualificados. Rápido, seguro e sem burocracia.</p>
+    <div class="hero-ctas">
+      <button class="btn-gold" onclick="document.getElementById('formulario').scrollIntoView({behavior:'smooth'})">
+        Quero avaliar meu imóvel grátis
+      </button>
+      <button class="btn-ghost" onclick="window.open('https://wa.me/5519971227844','_blank')">
+        Falar pelo WhatsApp
+      </button>
+    </div>
+  </div>
+  <div class="scroll-hint">role para ver mais</div>
+</section>
+
+<!-- PROVAS SOCIAIS -->
+<div class="wrap">
+  <div class="proofs reveal">
+    <div class="proof">
+      <div class="proof-num">+200</div>
+      <div class="proof-label">Imóveis vendidos em Piracicaba</div>
+    </div>
+    <div class="proof">
+      <div class="proof-num">24h</div>
+      <div class="proof-label">Para receber sua avaliação</div>
+    </div>
+    <div class="proof">
+      <div class="proof-num">0</div>
+      <div class="proof-label">Custo para o proprietário</div>
+    </div>
+    <div class="proof">
+      <div class="proof-num">100%</div>
+      <div class="proof-label">Seguro e sem compromisso</div>
+    </div>
+  </div>
+
+  <!-- O QUE OFERECEMOS -->
+  <div class="reveal">
+    <div class="section-label">O que oferecemos</div>
+    <h2 class="section-title">Tudo o que você precisa<br>para vender bem</h2>
+    <p class="section-sub">Sem taxa antecipada, sem burocracia. Você só paga quando vender.</p>
+  </div>
+
+  <div class="offers reveal">
+    <div class="offer featured">
+      <div class="offer-badge">GRÁTIS</div>
+      <div class="offer-icon">🏡</div>
+      <h3>Avaliação Gratuita</h3>
+      <p>Saiba o valor real do seu imóvel no mercado de Piracicaba. Avaliação feita por especialistas, sem custo e sem obrigação.</p>
+    </div>
+    <div class="offer">
+      <div class="offer-icon">📅</div>
+      <h3>Visita Sem Compromisso</h3>
+      <p>Nosso corretor vai até você, conhece o imóvel e apresenta as melhores estratégias de venda. Sem pressão.</p>
+    </div>
+    <div class="offer">
+      <div class="offer-icon">⚡</div>
+      <h3>Venda Rápida</h3>
+      <p>Conectamos você a compradores qualificados que já estão procurando imóveis em Piracicaba. Menos tempo à venda, melhor preço.</p>
+    </div>
+    <div class="offer">
+      <div class="offer-icon">🔒</div>
+      <h3>Processo Seguro</h3>
+      <p>Cuidamos de toda a documentação e negociação. Você fica tranquilo do início ao fim da venda.</p>
+    </div>
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <div class="how">
+    <div class="reveal" style="margin-bottom:32px">
+      <div class="section-label">Processo</div>
+      <h2 class="section-title">Como funciona?</h2>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-n">01</div>
+        <h4>Você preenche o formulário</h4>
+        <p>Leva menos de 2 minutos. Dados básicos do seu imóvel em Piracicaba.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <h4>Recebe a avaliação</h4>
+        <p>Em até 24h você sabe o valor do seu imóvel no mercado atual.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <h4>Agendamos uma visita</h4>
+        <p>Nosso especialista vai até você. Sem custo e sem pressão.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">04</div>
+        <h4>Seu imóvel é vendido</h4>
+        <p>Apresentamos compradores qualificados e fechamos o negócio com segurança.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div class="form-section reveal" id="formulario">
+    <div class="form-wrap">
+
+      <!-- ESQUERDA -->
+      <div class="form-left">
+        <h2>Avalie seu imóvel<br><em style="color:var(--gold);font-style:normal">gratuitamente</em></h2>
+        <p>Preencha o formulário e entraremos em contato pelo WhatsApp em até 24 horas.</p>
+        <div class="guarantee">
+          <div class="g-item">
+            <div class="g-icon">✓</div>
+            <div class="g-text"><strong>100% gratuito</strong>Sem nenhum custo para receber a avaliação</div>
+          </div>
+          <div class="g-item">
+            <div class="g-icon">✓</div>
+            <div class="g-text"><strong>Sem compromisso</strong>Você decide se quer continuar ou não</div>
+          </div>
+          <div class="g-item">
+            <div class="g-icon">✓</div>
+            <div class="g-text"><strong>Resposta rápida</strong>Retornamos em até 24 horas pelo WhatsApp</div>
+          </div>
+          <div class="g-item">
+            <div class="g-icon">✓</div>
+            <div class="g-text"><strong>Especialistas em Piracicaba</strong>Conhecemos cada bairro da cidade</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIREITA (FORM) -->
+      <div class="form-right">
+        <div class="success-overlay" id="success-overlay">
+          <div class="s-icon">✅</div>
+          <div class="s-title">Recebemos!</div>
+          <div class="s-sub">Abrindo o WhatsApp para confirmar seus dados. Retornamos em até 24h.</div>
+        </div>
+
+        <div class="fields" id="form-fields">
+          <div>
+            <input type="text" id="nome" placeholder="Seu nome completo"/>
+            <div class="error-msg" id="err-nome">⚠ Nome é obrigatório</div>
+          </div>
+          <div>
+            <input type="tel" id="whatsapp" placeholder="Seu WhatsApp (ex: 19912345678)"/>
+            <div class="error-msg" id="err-whatsapp">⚠ WhatsApp inválido</div>
+          </div>
+          <div>
+            <input type="text" id="endereco" placeholder="Endereço do imóvel (rua e bairro)"/>
+            <div class="error-msg" id="err-endereco">⚠ Endereço é obrigatório</div>
+          </div>
+          <div>
+            <select id="tipo">
+              <option value="">Tipo do imóvel</option>
+              <option>Casa</option>
+              <option>Apartamento</option>
+              <option>Terreno</option>
+              <option>Comercial</option>
+            </select>
+            <div class="error-msg" id="err-tipo">⚠ Selecione o tipo</div>
+          </div>
+          <div>
+            <input type="text" id="valor" placeholder="Valor que espera receber (opcional)"/>
+          </div>
+          <div>
+            <textarea id="descricao" placeholder="Algo que queira nos contar sobre o imóvel? (opcional)"></textarea>
+          </div>
+          <button class="btn-submit" onclick="submitForm()">
+            Quero minha avaliação gratuita →
+          </button>
+          <p class="form-note">🔒 Seus dados são enviados com segurança pelo WhatsApp</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <strong>Dark Company Negócios Imobiliários</strong><br>
+  <span style="margin-top:6px;display:inline-block">Piracicaba, SP · (19) 97122-7844</span>
+</footer>
+
+<script>
+  const WHATSAPP = "5519971227844";
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add("visible") });
+  }, {threshold:0.1});
+  document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
+
+  // Errors
+  function clearErr(id){
+    document.getElementById(id)?.classList.remove("field-error");
+    document.getElementById("err-"+id)?.classList.remove("show");
+  }
+  function showErr(id, msg){
+    document.getElementById(id)?.classList.add("field-error");
+    const e = document.getElementById("err-"+id);
+    if(e){ e.textContent = "⚠ "+msg; e.classList.add("show"); }
+  }
+  ["nome","whatsapp","endereco","tipo"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", () => clearErr(id));
+    document.getElementById(id)?.addEventListener("change", () => clearErr(id));
+  });
+
+  function submitForm(){
+    const nome     = document.getElementById("nome").value.trim();
+    const wpp      = document.getElementById("whatsapp").value.trim();
+    const endereco = document.getElementById("endereco").value.trim();
+    const tipo     = document.getElementById("tipo").value;
+    const valor    = document.getElementById("valor").value.trim();
+    const desc     = document.getElementById("descricao").value.trim();
+
+    ["nome","whatsapp","endereco","tipo"].forEach(clearErr);
+    let ok = true;
+
+    if(!nome){ showErr("nome","Nome é obrigatório"); ok=false; }
+    if(!wpp){ showErr("whatsapp","WhatsApp é obrigatório"); ok=false; }
+    else if(!/^\d{10,11}$/.test(wpp.replace(/\D/g,""))){ showErr("whatsapp","Informe DDD + número (somente dígitos)"); ok=false; }
+    if(!endereco){ showErr("endereco","Endereço é obrigatório"); ok=false; }
+    if(!tipo){ showErr("tipo","Selecione o tipo do imóvel"); ok=false; }
+
+    if(!ok){
+      const wrap = document.getElementById("form-fields");
+      wrap.style.animation = "shake 0.5s ease";
+      setTimeout(() => wrap.style.animation = "", 600);
+      return;
+    }
+
+    document.getElementById("success-overlay").classList.add("show");
+
+    const msg = encodeURIComponent(
+      `Olá! Gostaria de uma avaliação gratuita do meu imóvel:\n\n`+
+      `👤 Nome: ${nome}\n`+
+      `📍 Endereço: ${endereco}\n`+
+      `🏠 Tipo: ${tipo}\n`+
+      `💰 Valor esperado: ${valor || "Não informado"}\n`+
+      `📝 Observações: ${desc || "Nenhuma"}`
+    );
+
+    setTimeout(() => window.open(`https://wa.me/${WHATSAPP}?text=${msg}`,"_blank"), 900);
+  }
+</script>
+</body>
+</html>

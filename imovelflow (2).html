@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ImóvelFlow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#c9d1d9;min-height:100vh}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0d1117}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
+
+/* HEADER */
+#header{background:#161b22;border-bottom:1px solid #21262d;padding:0 20px;display:flex;align-items:center;gap:10px;height:56px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
+.logo{font-weight:800;font-size:16px;color:#fbbf24;letter-spacing:-0.5px}
+.sep{width:1px;height:26px;background:#21262d;margin:0 4px}
+.nav-btn{background:transparent;color:#8b949e;border:1px solid transparent;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit}
+.nav-btn.active{background:#fbbf2418;color:#fbbf24;border-color:#fbbf2444}
+#btn-novo{margin-left:auto;background:#fbbf24;color:#0d1117;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:800;font-family:inherit}
+#salvo-badge{font-size:11px;color:#4ade80;display:none}
+
+/* MAIN */
+#main{padding:18px 20px;max-width:1380px;margin:0 auto}
+
+/* STATS */
+#stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#161b22;border-radius:10px;padding:14px 16px}
+.stat-val{font-size:17px;font-weight:800;color:#f0f6fc;margin-bottom:2px;font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px}
+.stat-sub{font-size:11px;margin-top:3px}
+
+/* TOOLBAR */
+#toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+#busca{background:#161b22;border:1px solid #21262d;border-radius:7px;padding:7px 11px;color:#c9d1d9;font-size:12px;outline:none;width:200px;font-family:inherit}
+#filtro-etapa{background:#161b22;border:1px solid #21262d;border-radius:7px;padding:7px 10px;color:#c9d1d9;font-size:12px;outline:none;font-family:inherit}
+#qtd-label{font-size:11px;color:#6e7681}
+
+/* KANBAN */
+#kanban{display:flex;gap:10px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.k-col{min-width:210px;background:#161b22;border-radius:10px;padding:10px;flex-shrink:0}
+.k-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:8px}
+.k-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.k-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex:1}
+.k-qtd{border-radius:8px;padding:1px 6px;font-size:11px;font-weight:700}
+.deal-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:10px;margin-bottom:7px;cursor:pointer}
+.deal-card:hover{border-color:#30363d}
+.deal-nome{font-weight:700;font-size:12px;color:#f0f6fc;margin-bottom:2px}
+.deal-imovel{font-size:10px;color:#6e7681;margin-bottom:5px;line-height:1.4}
+.deal-valor{font-size:13px;font-weight:800;color:#fbbf24}
+.deal-com{font-size:10px;color:#a78bfa;margin-top:1px}
+.deal-rec{font-size:10px;color:#4ade80;margin-top:1px}
+.deal-ar{font-size:10px;margin-top:1px}
+.k-empty{font-size:11px;color:#21262d;text-align:center;padding:6px}
+
+/* TABLE */
+#lista-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:#161b22;border-radius:10px;overflow:hidden;border:1px solid #21262d}
+th{background:#0d1117;padding:9px 12px;text-align:left;font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #21262d;font-weight:600}
+td{padding:10px 12px;font-size:12px;border-bottom:1px solid #0d1117;vertical-align:middle}
+tr:hover td{background:#161b2266}
+.td-nome{font-weight:700;color:#f0f6fc}
+.td-phone{font-size:10px;color:#6e7681;margin-top:1px}
+
+/* DASHBOARD */
+#dashboard .dash-sec{font-weight:800;font-size:14px;color:#f0f6fc;margin-bottom:12px;margin-top:4px}
+#dashboard .dash-card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;margin-bottom:16px}
+.bar-row{margin-bottom:11px}
+.bar-lbl{display:flex;justify-content:space-between;margin-bottom:3px}
+.bar-track{background:#0d1117;border-radius:4px;height:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.top-row{display:flex;align-items:center;gap:12px;padding:11px 0;cursor:pointer}
+.top-row:not(:last-child){border-bottom:1px solid #0d1117}
+.top-row:hover .td-nome{color:#fbbf24}
+
+/* BADGE */
+.badge{display:inline-block;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700}
+
+/* RELATÓRIO */
+#relatorio{padding-bottom:20px}
+.rel-ano{font-size:13px;font-weight:800;color:#6e7681;text-transform:uppercase;letter-spacing:2px;margin:20px 0 10px}
+.rel-mes-card{background:#161b22;border:1px solid #21262d;border-radius:12px;margin-bottom:16px;overflow:hidden}
+.rel-mes-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;border-bottom:1px solid #21262d;flex-wrap:wrap;gap:8px}
+.rel-mes-header:hover{background:#1c2128}
+.rel-mes-nome{font-size:15px;font-weight:800;color:#f0f6fc}
+.rel-mes-qtd{font-size:11px;color:#6e7681;margin-top:1px}
+.rel-mes-nums{display:flex;gap:20px;flex-wrap:wrap}
+.rel-num{text-align:right}
+.rel-num .rv{font-size:14px;font-weight:800}
+.rel-num .rl{font-size:10px;color:#6e7681}
+.rel-mes-body{display:none;padding:0 18px 14px}
+.rel-mes-body.open{display:block}
+.rel-deal-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #0d1117;flex-wrap:wrap}
+.rel-deal-row:last-child{border-bottom:none}
+.rel-deal-info{flex:1;min-width:160px}
+.rel-deal-nome{font-weight:700;color:#f0f6fc;font-size:12px}
+.rel-deal-imovel{font-size:10px;color:#6e7681;margin-top:1px}
+.rel-deal-nums{display:flex;gap:14px;flex-wrap:wrap;text-align:right}
+.rel-deal-num .dv{font-size:12px;font-weight:700}
+.rel-deal-num .dl{font-size:10px;color:#6e7681}
+.rel-filtros{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.rel-sem-dados{text-align:center;padding:40px;color:#6e7681;font-size:13px}
+.rel-resumo{background:#161b22;border:1px solid #fbbf2433;border-radius:10px;padding:16px;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+
+/* MODAL */
+#overlay{position:fixed;inset:0;background:#000c;z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+#overlay.open{display:flex}
+#modal-box{background:#161b22;border:1px solid #21262d;border-radius:14px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto}
+#modal-head{padding:16px 20px 12px;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between}
+#modal-title{font-size:16px;font-weight:800;color:#f0f6fc}
+#btn-fechar{background:none;border:none;color:#6e7681;cursor:pointer;font-size:18px;line-height:1}
+#modal-body{padding:16px 20px}
+#modal-foot{padding:12px 20px;border-bottom-left-radius:14px;border-bottom-right-radius:14px;border-top:1px solid #21262d;display:flex;gap:8px;align-items:center}
+.lbl{display:block;font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.inp{width:100%;background:#0d1117;border:1px solid #21262d;border-radius:7px;padding:8px 10px;color:#c9d1d9;font-size:12px;outline:none;font-family:inherit;box-sizing:border-box}
+.inp:focus{border-color:#fbbf2466}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row1{margin-bottom:12px}
+#com-box{background:#0f3320;border:1px solid #4ade8033;border-radius:7px;padding:10px 14px;margin-bottom:12px;display:none;gap:20px;align-items:center;flex-wrap:wrap}
+.com-item .cv{font-weight:800;font-size:14px}
+.com-item .cl{font-size:10px;color:#6e7681;margin-bottom:2px}
+#btn-excluir{background:#7f1d1d22;border:1px solid #7f1d1d;border-radius:7px;padding:7px 14px;color:#f87171;cursor:pointer;font-size:12px;font-family:inherit;margin-right:auto;display:none}
+#btn-cancelar{background:transparent;border:1px solid #21262d;border-radius:7px;padding:7px 14px;color:#8b949e;cursor:pointer;font-size:12px;font-family:inherit}
+#btn-salvar{background:#fbbf24;border:none;border-radius:7px;padding:7px 18px;color:#0d1117;cursor:pointer;font-size:12px;font-weight:800;font-family:inherit;margin-left:auto}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <span class="logo">🏠 ImóvelFlow</span>
+  <div class="sep"></div>
+  <button class="nav-btn active" data-view="kanban">Pipeline</button>
+  <button class="nav-btn" data-view="lista">Lista</button>
+  <button class="nav-btn" data-view="dashboard">Dashboard</button>
+  <button class="nav-btn" data-view="relatorio">📋 Relatório Mensal</button>
+  <span id="salvo-badge">✓ Salvo</span>
+  <button id="btn-novo">+ Novo Negócio</button>
+</div>
+
+<div id="main">
+  <div id="stats"></div>
+
+  <div id="toolbar">
+    <input id="busca" placeholder="🔍 Buscar cliente ou imóvel…">
+    <select id="filtro-etapa">
+      <option value="todas">Todas as etapas</option>
+    </select>
+    <span id="qtd-label"></span>
+  </div>
+
+  <div id="kanban" style="display:flex"></div>
+  <div id="lista-wrap" style="display:none"></div>
+  <div id="dashboard" style="display:none"></div>
+  <div id="relatorio" style="display:none"></div>
+</div>
+
+<!-- MODAL -->
+<div id="overlay">
+  <div id="modal-box">
+    <div id="modal-head">
+      <span id="modal-title">Novo Negócio</span>
+      <button id="btn-fechar">✕</button>
+    </div>
+    <div id="modal-body">
+      <div class="row2">
+        <div><label class="lbl">Cliente *</label><input class="inp" id="f-cliente" placeholder="Nome completo"></div>
+        <div><label class="lbl">Telefone</label><input class="inp" id="f-tel" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div class="row1"><label class="lbl">Imóvel *</label><input class="inp" id="f-imovel" placeholder="Endereço ou descrição"></div>
+      <div class="row2">
+        <div><label class="lbl">Valor do Imóvel (R$)</label><input class="inp" id="f-valor" type="number" placeholder="0"></div>
+        <div><label class="lbl">Comissão (%)</label><input class="inp" id="f-pct" type="number" step="0.5" value="6"></div>
+      </div>
+      <div id="com-box">
+        <div class="com-item"><div class="cl">Comissão total</div><div class="cv" style="color:#a78bfa" id="cx-total">R$ 0,00</div></div>
+        <div class="com-item"><div class="cl">Já recebida</div><div class="cv" style="color:#4ade80" id="cx-rec">R$ 0,00</div></div>
+        <div class="com-item"><div class="cl">A receber</div><div class="cv" id="cx-ar">R$ 0,00</div></div>
+      </div>
+      <div class="row1"><label class="lbl">Comissão Já Recebida (R$)</label><input class="inp" id="f-recebida" type="number" placeholder="0" value="0"></div>
+      <div class="row2">
+        <div>
+          <label class="lbl">Etapa</label>
+          <select class="inp" id="f-etapa"></select>
+        </div>
+        <div>
+          <label class="lbl">Status Banco</label>
+          <select class="inp" id="f-banco">
+            <option>—</option>
+            <option>Em análise</option>
+            <option>Pendente docs</option>
+            <option>Aprovado</option>
+            <option>Reprovado</option>
+            <option>Dispensado</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
+        <div><label class="lbl">Data de Entrada</label><input class="inp" id="f-data" type="date"></div>
+        <div><label class="lbl">Data de Fechamento</label><input class="inp" id="f-fechamento" type="date"></div>
+      </div>
+      <div class="row1"><label class="lbl">Observações</label><textarea class="inp" id="f-obs" rows="3" placeholder="Notas, pendências, próximos passos…" style="resize:vertical"></textarea></div>
+    </div>
+    <div id="modal-foot">
+      <button id="btn-excluir">🗑 Excluir</button>
+      <button id="btn-cancelar">Cancelar</button>
+      <button id="btn-salvar">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ETAPAS = [
+  {id:'proposta',      label:'Proposta',        cor:'#60a5fa'},
+  {id:'aceita',        label:'Aceita',           cor:'#34d399'},
+  {id:'documentacao',  label:'Documentação',     cor:'#a78bfa'},
+  {id:'analise_banco', label:'Análise Banco',    cor:'#fb923c'},
+  {id:'aprovado',      label:'Aprovado',         cor:'#4ade80'},
+  {id:'assinatura',    label:'Assinatura',       cor:'#2dd4bf'},
+  {id:'chaves',        label:'Chaves Entregues', cor:'#fbbf24'},
+];
+
+const BANCO_CORES = {
+  'Em análise':'#fb923c','Aprovado':'#4ade80','Reprovado':'#f87171',
+  'Pendente docs':'#a78bfa','Dispensado':'#94a3b8','—':'#6e7681'
+};
+
+let negócios = [];
+let nextId = 1;
+let telaAtual = 'kanban';
+let modalId = null;
+
+const STORAGE_KEY = 'imovelflow_dados';
+
+function carregar(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const p = JSON.parse(raw);
+      if(Array.isArray(p.negócios)) negócios = p.negócios;
+      if(p.nextId) nextId = p.nextId;
+    }
+  }catch(e){ console.warn('Erro ao carregar dados:', e); }
+}
+
+function persistir(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({negócios, nextId}));
+    const b = document.getElementById('salvo-badge');
+    b.style.display = 'inline';
+    setTimeout(()=>b.style.display='none', 1800);
+  }catch(e){ alert('Erro ao salvar: ' + e.message); }
+}
+
+// Formatação
+const R=(v)=>Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const Dt=(d)=>d?new Date(d+'T12:00').toLocaleDateString('pt-BR'):'—';
+const corEtapa=(id)=>ETAPAS.find(e=>e.id===id)?.cor??'#6e7681';
+const lblEtapa=(id)=>ETAPAS.find(e=>e.id===id)?.label??id;
+
+function badge(txt,cor){return`<span class="badge" style="background:${cor}22;color:${cor};border:1px solid ${cor}44">${txt}</span>`;}
+
+// ── RENDER STATS ──
+function renderStats(){
+  const vgv=negócios.reduce((s,n)=>s+n.valor,0);
+  const comTotal=negócios.reduce((s,n)=>s+(n.valor*n.comissaoPct/100),0);
+  const recTotal=negócios.reduce((s,n)=>s+(n.comissaoRecebida||0),0);
+  const arTotal=comTotal-recTotal;
+  const fechados=negócios.filter(n=>n.etapa==='chaves').length;
+  const items=[
+    {lbl:'Negócios',val:negócios.length,sub:`${fechados} fechados`,cor:'#60a5fa'},
+    {lbl:'VGV Total',val:R(vgv),sub:'valor dos imóveis',cor:'#fbbf24'},
+    {lbl:'Comissão Total',val:R(comTotal),sub:'estimada',cor:'#a78bfa'},
+    {lbl:'Já Recebida',val:R(recTotal),sub:`${comTotal?((recTotal/comTotal)*100).toFixed(0):0}% do total`,cor:'#4ade80'},
+    {lbl:'A Receber',val:R(arTotal),sub:'saldo pendente',cor:'#fb923c'},
+  ];
+  document.getElementById('stats').innerHTML=items.map(i=>`
+    <div class="stat-card" style="border:1px solid ${i.cor}33">
+      <div class="stat-val">${i.val}</div>
+      <div class="stat-lbl">${i.lbl}</div>
+      <div class="stat-sub" style="color:${i.cor}">${i.sub}</div>
+    </div>`).join('');
+}
+
+// ── RENDER KANBAN ──
+function renderKanban(lista){
+  const el=document.getElementById('kanban');
+  el.innerHTML=ETAPAS.map(et=>{
+    const cards=lista.filter(n=>n.etapa===et.id);
+    const cardsHtml=cards.length?cards.map(n=>{
+      const com=n.valor*n.comissaoPct/100;
+      const rec=n.comissaoRecebida||0;
+      const ar=com-rec;
+      return`<div class="deal-card" onclick="abrirEditar(${n.id})">
+        <div class="deal-nome">${n.cliente}</div>
+        <div class="deal-imovel">${n.imovel}</div>
+        <div class="deal-valor">${R(n.valor)}</div>
+        <div class="deal-com">Comissão: ${R(com)} (${n.comissaoPct}%)</div>
+        <div class="deal-rec">✅ Recebida: ${R(rec)}</div>
+        <div class="deal-ar" style="color:${ar>0?'#fb923c':'#4ade80'}">⏳ A receber: ${R(ar)}</div>
+        ${n.statusBanco!=='—'?`<div style="margin-top:5px">${badge(n.statusBanco,BANCO_CORES[n.statusBanco]||'#6e7681')}</div>`:''}
+      </div>`;
+    }).join(''):`<div class="k-empty">—</div>`;
+    return`<div class="k-col" style="border:1px solid ${et.cor}33">
+      <div class="k-head" style="border-bottom:1px solid ${et.cor}22">
+        <div class="k-dot" style="background:${et.cor}"></div>
+        <span class="k-title" style="color:${et.cor}">${et.label}</span>
+        <span class="k-qtd" style="background:${et.cor}22;color:${et.cor}">${cards.length}</span>
+      </div>
+      ${cardsHtml}
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER LISTA ──
+function renderLista(lista){
+  const rows=lista.map(n=>{
+    const com=n.valor*n.comissaoPct/100;
+    const rec=n.comissaoRecebida||0;
+    const ar=com-rec;
+    return`<tr onclick="abrirEditar(${n.id})" style="cursor:pointer">
+      <td><div class="td-nome">${n.cliente}</div>${n.telefone?`<div class="td-phone">${n.telefone}</div>`:''}</td>
+      <td style="color:#8b949e;max-width:180px">${n.imovel}</td>
+      <td style="font-weight:800;color:#fbbf24;white-space:nowrap">${R(n.valor)}</td>
+      <td>${badge(lblEtapa(n.etapa),corEtapa(n.etapa))}</td>
+      <td>${badge(n.statusBanco,BANCO_CORES[n.statusBanco]||'#6e7681')}</td>
+      <td style="color:#a78bfa;white-space:nowrap">${R(com)} <span style="color:#6e7681;font-size:10px">(${n.comissaoPct}%)</span></td>
+      <td style="color:#4ade80;font-weight:700;white-space:nowrap">${R(rec)}</td>
+      <td style="color:${ar>0?'#fb923c':'#4ade80'};font-weight:700;white-space:nowrap">${R(ar)}</td>
+      <td style="color:#6e7681;white-space:nowrap">${Dt(n.dataEntrada)}</td>
+      <td><button onclick="event.stopPropagation();abrirEditar(${n.id})" style="background:transparent;border:1px solid #21262d;border-radius:5px;padding:3px 8px;color:#8b949e;cursor:pointer;font-size:11px">✏️</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('lista-wrap').innerHTML=`<table>
+    <thead><tr>
+      <th>Cliente</th><th>Imóvel</th><th>Valor</th><th>Etapa</th><th>Banco</th>
+      <th>Comissão</th><th>Recebida</th><th>A Receber</th><th>Entrada</th><th></th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="10" style="text-align:center;padding:24px;color:#21262d">Nenhum negócio encontrado</td></tr>'}</tbody>
+  </table>`;
+}
+
+// ── RENDER DASHBOARD ──
+function renderDashboard(){
+  const comTotal=negócios.reduce((s,n)=>s+(n.valor*n.comissaoPct/100),0);
+  const recTotal=negócios.reduce((s,n)=>s+(n.comissaoRecebida||0),0);
+  const arTotal=comTotal-recTotal;
+  const pctRec=comTotal?(recTotal/comTotal*100):0;
+
+  const barras=ETAPAS.map(et=>{
+    const lst=negócios.filter(n=>n.etapa===et.id);
+    const vgv=lst.reduce((s,n)=>s+n.valor,0);
+    const pct=negócios.length?(lst.length/negócios.length*100):0;
+    return`<div class="bar-row">
+      <div class="bar-lbl">
+        <span style="font-size:12px;color:${et.cor};font-weight:600">${et.label}</span>
+        <span style="font-size:11px;color:#6e7681">${lst.length} · ${R(vgv)}</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${et.cor}"></div></div>
+    </div>`;
+  }).join('');
+
+  const top=[...negócios].sort((a,b)=>b.valor-a.valor).slice(0,5).map((n,i)=>{
+    const com=n.valor*n.comissaoPct/100;
+    const rec=n.comissaoRecebida||0;
+    const ar=com-rec;
+    return`<div class="top-row" onclick="abrirEditar(${n.id})">
+      <span style="font-weight:800;font-size:15px;color:#21262d;min-width:22px">#${i+1}</span>
+      <div style="flex:1">
+        <div class="td-nome" style="font-size:12px">${n.cliente}</div>
+        <div style="font-size:10px;color:#6e7681">${n.imovel}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800;color:#fbbf24;font-size:13px">${R(n.valor)}</div>
+        <div style="font-size:10px;color:#4ade80">rec: ${R(rec)}</div>
+        <div style="font-size:10px;color:${ar>0?'#fb923c':'#4ade80'}">a rec: ${R(ar)}</div>
+      </div>
+      ${badge(lblEtapa(n.etapa),corEtapa(n.etapa))}
+    </div>`;
+  }).join('');
+
+  document.getElementById('dashboard').innerHTML=`
+    <div class="dash-sec">Comissões</div>
+    <div class="dash-card">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px">
+        <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total estimado</div><div style="font-size:18px;font-weight:800;color:#a78bfa">${R(comTotal)}</div></div>
+        <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Já recebida</div><div style="font-size:18px;font-weight:800;color:#4ade80">${R(recTotal)}</div></div>
+        <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">A receber</div><div style="font-size:18px;font-weight:800;color:#fb923c">${R(arTotal)}</div></div>
+      </div>
+      <div style="font-size:10px;color:#6e7681;margin-bottom:4px">Percentual recebido</div>
+      <div style="background:#0d1117;border-radius:6px;height:10px;overflow:hidden">
+        <div style="width:${pctRec}%;height:100%;background:linear-gradient(90deg,#4ade80,#2dd4bf);border-radius:6px;transition:width .3s"></div>
+      </div>
+      <div style="font-size:11px;color:#4ade80;margin-top:4px">${pctRec.toFixed(1)}% recebido</div>
+    </div>
+    <div class="dash-sec">Negócios por Etapa</div>
+    <div class="dash-card">${barras}</div>
+    <div class="dash-sec">Maiores Negócios</div>
+    <div class="dash-card">${top||'<div style="color:#6e7681;font-size:12px">Nenhum negócio cadastrado</div>'}</div>
+  `;
+}
+
+// ── TELA ──
+function mudarTela(v){
+  telaAtual=v;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  document.getElementById('kanban').style.display=v==='kanban'?'flex':'none';
+  document.getElementById('lista-wrap').style.display=v==='lista'?'block':'none';
+  document.getElementById('dashboard').style.display=v==='dashboard'?'block':'none';
+  document.getElementById('relatorio').style.display=v==='relatorio'?'block':'none';
+  document.getElementById('toolbar').style.display=(v==='dashboard'||v==='relatorio')?'none':'flex';
+  renderTela();
+}
+
+function getFiltrados(){
+  const b=document.getElementById('busca').value.toLowerCase();
+  const fe=document.getElementById('filtro-etapa').value;
+  return negócios.filter(n=>{
+    const me=fe==='todas'||n.etapa===fe;
+    const mb=!b||n.cliente.toLowerCase().includes(b)||n.imovel.toLowerCase().includes(b);
+    return me&&mb;
+  });
+}
+
+function renderTela(){
+  renderStats();
+  const lista=getFiltrados();
+  document.getElementById('qtd-label').textContent=`${lista.length} negócio(s)`;
+  if(telaAtual==='kanban') renderKanban(lista);
+  else if(telaAtual==='lista') renderLista(lista);
+  else if(telaAtual==='dashboard') renderDashboard();
+  else if(telaAtual==='relatorio') renderRelatorio();
+}
+
+// ── MODAL ──
+function abrirModal(n){
+  modalId = n ? n.id : null;
+  document.getElementById('modal-title').textContent = n ? '✏️ Editar Negócio' : '➕ Novo Negócio';
+  document.getElementById('btn-excluir').style.display = n ? 'block' : 'none';
+  document.getElementById('f-cliente').value = n?.cliente||'';
+  document.getElementById('f-tel').value = n?.telefone||'';
+  document.getElementById('f-imovel').value = n?.imovel||'';
+  document.getElementById('f-valor').value = n?.valor||'';
+  document.getElementById('f-pct').value = n?.comissaoPct??6;
+  document.getElementById('f-recebida').value = n?.comissaoRecebida||0;
+  document.getElementById('f-etapa').value = n?.etapa||'proposta';
+  document.getElementById('f-banco').value = n?.statusBanco||'—';
+  document.getElementById('f-data').value = n?.dataEntrada||new Date().toISOString().slice(0,10);
+  document.getElementById('f-fechamento').value = n?.dataFechamento||'';
+  document.getElementById('f-obs').value = n?.obs||'';
+  atualizarComBox();
+  document.getElementById('overlay').classList.add('open');
+}
+
+function abrirEditar(id){
+  const n=negócios.find(x=>x.id===id);
+  if(n) abrirModal(n);
+}
+
+function fecharModal(){
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function atualizarComBox(){
+  const v=parseFloat(document.getElementById('f-valor').value)||0;
+  const pct=parseFloat(document.getElementById('f-pct').value)||0;
+  const rec=parseFloat(document.getElementById('f-recebida').value)||0;
+  const com=v*pct/100;
+  const ar=com-rec;
+  const box=document.getElementById('com-box');
+  if(v>0&&pct>0){
+    box.style.display='flex';
+    document.getElementById('cx-total').textContent=R(com);
+    document.getElementById('cx-rec').textContent=R(rec);
+    document.getElementById('cx-ar').textContent=R(ar);
+    document.getElementById('cx-ar').style.color=ar>0?'#fb923c':'#4ade80';
+  } else {
+    box.style.display='none';
+  }
+}
+
+function salvarModal(){
+  const cliente=document.getElementById('f-cliente').value.trim();
+  const imovel=document.getElementById('f-imovel').value.trim();
+  if(!cliente||!imovel){alert('Preencha ao menos o nome do cliente e o imóvel.');return;}
+  const nd={
+    id: modalId ?? nextId,
+    cliente,
+    telefone: document.getElementById('f-tel').value.trim(),
+    imovel,
+    valor: parseFloat(document.getElementById('f-valor').value)||0,
+    comissaoPct: parseFloat(document.getElementById('f-pct').value)||0,
+    comissaoRecebida: parseFloat(document.getElementById('f-recebida').value)||0,
+    etapa: document.getElementById('f-etapa').value,
+    statusBanco: document.getElementById('f-banco').value,
+    dataEntrada: document.getElementById('f-data').value,
+    dataFechamento: document.getElementById('f-fechamento').value,
+    obs: document.getElementById('f-obs').value.trim(),
+  };
+  if(modalId===null){
+    negócios.push(nd);
+    nextId++;
+  } else {
+    negócios=negócios.map(n=>n.id===modalId?nd:n);
+  }
+  persistir();
+  fecharModal();
+  renderTela();
+}
+
+function excluirModal(){
+  if(modalId===null) return;
+  if(!confirm('Excluir este negócio permanentemente?')) return;
+  negócios=negócios.filter(n=>n.id!==modalId);
+  persistir();
+  fecharModal();
+  renderTela();
+}
+
+// ── RELATÓRIO MENSAL ──
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function renderRelatorio(){
+  const el = document.getElementById('relatorio');
+
+  // Pegar filtros do relatório
+  const anoFiltro = document.getElementById('rel-ano-sel')?.value || 'todos';
+  const tipoFiltro = document.getElementById('rel-tipo-sel')?.value || 'fechados';
+
+  // Definir quais negócios mostrar
+  let base = tipoFiltro === 'todos' ? negócios : negócios.filter(n => n.etapa === 'chaves');
+
+  // Agrupar por mês/ano usando dataFechamento ou dataEntrada
+  const grupos = {};
+  base.forEach(n => {
+    const ref = n.dataFechamento || n.dataEntrada;
+    if(!ref) return;
+    const d = new Date(ref + 'T12:00');
+    const ano = d.getFullYear();
+    const mes = d.getMonth();
+    const chave = `${ano}-${String(mes+1).padStart(2,'0')}`;
+    if(!grupos[chave]) grupos[chave] = {ano, mes, negócios:[]};
+    grupos[chave].negócios.push(n);
+  });
+
+  // Ordenar meses (mais recente primeiro)
+  const chaves = Object.keys(grupos).sort((a,b) => b.localeCompare(a));
+  const anos = [...new Set(chaves.map(c => grupos[c].ano.toString()))].sort((a,b)=>b-a);
+
+  // Filtrar por ano
+  const chavesFiltradas = anoFiltro === 'todos' ? chaves : chaves.filter(c => grupos[c].ano.toString() === anoFiltro);
+
+  // Totais gerais filtrados
+  const todosNeg = chavesFiltradas.flatMap(c => grupos[c].negócios);
+  const tVGV = todosNeg.reduce((s,n)=>s+n.valor,0);
+  const tCom = todosNeg.reduce((s,n)=>s+(n.valor*n.comissaoPct/100),0);
+  const tRec = todosNeg.reduce((s,n)=>s+(n.comissaoRecebida||0),0);
+  const tAR  = tCom - tRec;
+
+  // Construir HTML
+  let html = `
+    <div class="rel-filtros">
+      <select class="inp" id="rel-tipo-sel" style="width:auto" onchange="renderRelatorio()">
+        <option value="fechados" ${tipoFiltro==='fechados'?'selected':''}>Somente Chaves Entregues</option>
+        <option value="todos" ${tipoFiltro==='todos'?'selected':''}>Todos os Negócios</option>
+      </select>
+      <select class="inp" id="rel-ano-sel" style="width:auto" onchange="renderRelatorio()">
+        <option value="todos" ${anoFiltro==='todos'?'selected':''}>Todos os anos</option>
+        ${anos.map(a=>`<option value="${a}" ${anoFiltro===a?'selected':''}>${a}</option>`).join('')}
+      </select>
+      <span style="font-size:11px;color:#6e7681">${todosNeg.length} negócio(s) encontrado(s)</span>
+    </div>`;
+
+  if(todosNeg.length > 0){
+    html += `<div class="rel-resumo">
+      <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Negócios</div><div style="font-size:20px;font-weight:800;color:#60a5fa">${todosNeg.length}</div></div>
+      <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">VGV Total</div><div style="font-size:16px;font-weight:800;color:#fbbf24">${R(tVGV)}</div></div>
+      <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Comissão Total</div><div style="font-size:16px;font-weight:800;color:#a78bfa">${R(tCom)}</div></div>
+      <div><div style="font-size:10px;color:#6e7681;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">A Receber</div><div style="font-size:16px;font-weight:800;color:#fb923c">${R(tAR)}</div></div>
+    </div>`;
+  }
+
+  if(chavesFiltradas.length === 0){
+    html += `<div class="rel-sem-dados">📭 Nenhum negócio encontrado.<br><span style="font-size:11px">Adicione negócios com data de fechamento preenchida.</span></div>`;
+  } else {
+    let anoAtual = null;
+    chavesFiltradas.forEach(chave => {
+      const g = grupos[chave];
+      if(g.ano !== anoAtual){
+        anoAtual = g.ano;
+        html += `<div class="rel-ano">${g.ano}</div>`;
+      }
+      const vgv = g.negócios.reduce((s,n)=>s+n.valor,0);
+      const com = g.negócios.reduce((s,n)=>s+(n.valor*n.comissaoPct/100),0);
+      const rec = g.negócios.reduce((s,n)=>s+(n.comissaoRecebida||0),0);
+      const ar  = com - rec;
+
+      const deals = g.negócios.map(n=>{
+        const nc = n.valor*n.comissaoPct/100;
+        const nr = n.comissaoRecebida||0;
+        const nar = nc-nr;
+        const ref = n.dataFechamento||n.dataEntrada;
+        return `<div class="rel-deal-row" onclick="abrirEditar(${n.id})" style="cursor:pointer">
+          <div class="rel-deal-info">
+            <div class="rel-deal-nome">${n.cliente}</div>
+            <div class="rel-deal-imovel">${n.imovel}</div>
+            ${ref?`<div style="font-size:10px;color:#6e7681;margin-top:1px">📅 ${Dt(ref)}</div>`:''}
+          </div>
+          <div class="rel-deal-nums">
+            <div class="rel-deal-num"><div class="dv" style="color:#fbbf24">${R(n.valor)}</div><div class="dl">Valor</div></div>
+            <div class="rel-deal-num"><div class="dv" style="color:#a78bfa">${R(nc)}</div><div class="dl">Comissão ${n.comissaoPct}%</div></div>
+            <div class="rel-deal-num"><div class="dv" style="color:#4ade80">${R(nr)}</div><div class="dl">Recebida</div></div>
+            <div class="rel-deal-num"><div class="dv" style="color:${nar>0?'#fb923c':'#4ade80'}">${R(nar)}</div><div class="dl">A receber</div></div>
+            ${badge(lblEtapa(n.etapa),corEtapa(n.etapa))}
+          </div>
+        </div>`;
+      }).join('');
+
+      html += `<div class="rel-mes-card">
+        <div class="rel-mes-header" onclick="toggleMes('${chave}')">
+          <div>
+            <div class="rel-mes-nome">${MESES_PT[g.mes]}</div>
+            <div class="rel-mes-qtd">${g.negócios.length} negócio(s)</div>
+          </div>
+          <div class="rel-mes-nums">
+            <div class="rel-num"><div class="rv" style="color:#fbbf24">${R(vgv)}</div><div class="rl">VGV</div></div>
+            <div class="rel-num"><div class="rv" style="color:#a78bfa">${R(com)}</div><div class="rl">Comissão</div></div>
+            <div class="rel-num"><div class="rv" style="color:#4ade80">${R(rec)}</div><div class="rl">Recebida</div></div>
+            <div class="rel-num"><div class="rv" style="color:${ar>0?'#fb923c':'#4ade80'}">${R(ar)}</div><div class="rl">A receber</div></div>
+            <span style="color:#6e7681;font-size:16px;align-self:center" id="arr-${chave}">▶</span>
+          </div>
+        </div>
+        <div class="rel-mes-body" id="body-${chave}">${deals}</div>
+      </div>`;
+    });
+  }
+
+  el.innerHTML = html;
+}
+
+function toggleMes(chave){
+  const body = document.getElementById('body-'+chave);
+  const arr  = document.getElementById('arr-'+chave);
+  if(!body) return;
+  body.classList.toggle('open');
+  arr.textContent = body.classList.contains('open') ? '▼' : '▶';
+}
+
+// ── INIT ──
+(()=>{
+  // Popular select etapas
+  const sel=document.getElementById('f-etapa');
+  ETAPAS.forEach(e=>{const o=document.createElement('option');o.value=e.id;o.textContent=e.label;sel.appendChild(o);});
+  const fsel=document.getElementById('filtro-etapa');
+  ETAPAS.forEach(e=>{const o=document.createElement('option');o.value=e.id;o.textContent=e.label;fsel.appendChild(o);});
+
+  // Eventos
+  document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>mudarTela(b.dataset.view)));
+  document.getElementById('btn-novo').addEventListener('click',()=>abrirModal(null));
+  document.getElementById('btn-fechar').addEventListener('click',fecharModal);
+  document.getElementById('btn-cancelar').addEventListener('click',fecharModal);
+  document.getElementById('btn-salvar').addEventListener('click',salvarModal);
+  document.getElementById('btn-excluir').addEventListener('click',excluirModal);
+  document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)fecharModal();});
+  document.getElementById('busca').addEventListener('input',renderTela);
+  document.getElementById('filtro-etapa').addEventListener('change',renderTela);
+  ['f-valor','f-pct','f-recebida'].forEach(id=>document.getElementById(id).addEventListener('input',atualizarComBox));
+
+  carregar();
+  renderTela();
+})();
+</script>
+</body>
+</html>
