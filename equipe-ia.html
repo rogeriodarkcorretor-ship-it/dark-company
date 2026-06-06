@@ -244,7 +244,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="api-title">Configurar API</div>
     <p class="api-sub">Adicione sua chave da Anthropic para ativar os especialistas de IA.</p>
     <div class="api-step"><div class="api-step-n">1</div><div class="api-step-t">Acesse <a href="https://console.anthropic.com/account/keys" target="_blank">console.anthropic.com</a> e crie uma API key.</div></div>
-    <div class="api-step"><div class="api-step-n">2</div><div class="api-step-t">Cole abaixo. Comeca com <strong style="color:#ff6b35">sk-ant-</strong> e fica salva no navegador.</div></div>
+    <div class="api-step"><div class="api-step-n">2</div><div class="api-step-t">Cole a chave completa abaixo. Come&#231;a com <strong style="color:#ff6b35">sk-ant-</strong> e fica salva apenas no seu navegador.</div></div>
     <div class="api-err" id="apiErr"></div>
     <label class="api-lbl" for="apiKeyInput">ANTHROPIC API KEY</label>
     <input class="api-inp" id="apiKeyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false"/>
@@ -385,7 +385,8 @@ function saveApiKey(){
   var val=document.getElementById('apiKeyInput').value.trim();
   var err=document.getElementById('apiErr');err.classList.remove('show');
   if(!val){err.textContent='Cole sua chave de API.';err.classList.add('show');return;}
-  if(val.indexOf('sk-ant-')!==0){err.textContent='Chave invalida. Deve comecar com sk-ant-';err.classList.add('show');return;}
+  if(val.indexOf('sk-ant-')!==0){err.textContent='Chave inv\u00e1lida. Deve come\u00e7ar com sk-ant-';err.classList.add('show');return;}
+  if(val.length<40){err.textContent='Chave muito curta. Copie a chave completa do console.';err.classList.add('show');return;}
   API_KEY=val; try{localStorage.setItem('imob_key_'+currentUser,val);}catch(e){}
   document.getElementById('apiScreen').classList.add('hidden');
   document.getElementById('keyBadge').style.display='flex';
@@ -666,12 +667,14 @@ async function sendMessage(text){
     var res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:ag.system,messages:apiMsgs})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,system:ag.system,messages:apiMsgs})
     });
     if(!res.ok){
       var ed=await res.json().catch(function(){return{};});
       var em=(ed.error&&ed.error.message)||'HTTP '+res.status;
-      if(res.status===401)em='Chave de API invalida. Clique em "API ativa" para corrigir.';
+      if(res.status===401)em='Chave inv\u00e1lida ou revogada. Crie uma NOVA chave em console.anthropic.com/account/keys e clique em "API ativa" para atualizar.';
+      if(res.status===403)em='Acesso negado. Verifique se sua conta tem cr\u00e9ditos em console.anthropic.com/settings/billing';
+      if(res.status===529||res.status===503)em='Servi\u00e7o tempor\u00e1riamente indispon\u00edvel. Tente novamente em instantes.';
       if(res.status===429)em='Limite atingido. Aguarde alguns segundos.';
       throw new Error(em);
     }
