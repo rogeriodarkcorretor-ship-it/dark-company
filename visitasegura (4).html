@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>VisitaSegura</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#F0F4FA;color:#1B2E4B;min-height:100vh}
+:root{--navy:#1B2E4B;--orange:#E8820C;--green:#16A34A;--red:#DC2626;--blue:#3B82F6;--border:#D1D9E8;--white:#fff}
+.topbar{background:var(--navy);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50}
+.topbar-icon{width:36px;height:36px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.topbar-title{color:#fff;font-weight:700;font-size:15px}
+.topbar-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:1px}
+.cfg-btn{margin-left:auto;background:rgba(255,255,255,.15);border:none;border-radius:9px;padding:7px 12px;color:rgba(255,255,255,.9);font-size:12px;font-weight:600;cursor:pointer}
+.steps{display:flex;align-items:center;padding:16px 16px 0;margin-bottom:14px}
+.step{display:flex;flex-direction:column;align-items:center;gap:3px}
+.step-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.step-dot.done{background:var(--green);color:#fff}
+.step-dot.active{background:var(--navy);color:#fff}
+.step-dot.idle{background:#CBD5E1;color:#94A3B8}
+.step-lbl{font-size:9px;font-weight:600;color:#94A3B8;white-space:nowrap}
+.step-lbl.active{color:var(--navy)}
+.step-line{flex:1;height:2px;margin:0 4px;margin-bottom:12px}
+.step-line.done{background:var(--green)}
+.step-line.idle{background:#CBD5E1}
+.card{background:#fff;border-radius:16px;border:1px solid var(--border);margin:0 12px 14px;padding:18px}
+.sec{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.req{color:var(--orange)}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:11px;padding:12px 14px;font-size:14px;color:var(--navy);background:#fff;outline:none;-webkit-appearance:none;appearance:none;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,130,12,.12)}
+.field textarea{resize:none;height:72px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px;border-radius:12px;border:none;padding:13px 20px;cursor:pointer;font-family:inherit;-webkit-appearance:none;width:100%}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-orange{background:var(--orange);color:#fff}
+.btn-ghost{background:#F1F5F9;color:#475569}
+.btn-green{background:var(--green);color:#fff}
+.btn-wa{background:#25D366;color:#fff}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-outline{background:transparent;border:2px solid var(--orange)!important;color:var(--orange)}
+.btn-row{display:flex;gap:10px;margin-bottom:10px}
+.btn-row .btn{flex:1}
+.errbox{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:11px;padding:12px 14px;font-size:13px;color:var(--red);margin-bottom:12px;line-height:1.7;display:none}
+.gps-btn-area{border:2px dashed var(--orange);border-radius:12px;padding:18px;text-align:center;cursor:pointer;background:#FFFBF5}
+.gps-btn-area p{font-size:14px;font-weight:600;color:var(--orange);margin-top:6px}
+.gps-btn-area small{font-size:11px;color:#94A3B8}
+.gps-ok{background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.gps-ok-icon{width:36px;height:36px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.photo-btn-area{border:2px dashed var(--orange);border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;background:#FFFBF5}
+.photo-icon-big{width:52px;height:52px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px}
+.photo-preview{position:relative;border-radius:12px;overflow:hidden}
+.photo-preview img{width:100%;height:180px;object-fit:cover;display:block}
+.photo-meta{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);padding:6px 10px;font-size:10px;color:#fff;font-family:monospace}
+.cam-overlay{position:fixed;inset:0;z-index:100;background:#000;display:none;flex-direction:column}
+.cam-bar{background:rgba(0,0,0,.85);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cam-bar span{color:#fff;font-weight:600;font-size:14px}
+.cam-bar button{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;padding:4px 8px}
+.cam-view{flex:1;position:relative;background:#111;overflow:hidden}
+#camVideo{width:100%;height:100%;object-fit:cover;display:none}
+#camPreviewImg{width:100%;height:100%;object-fit:contain;display:none;position:absolute;inset:0}
+.cam-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:12px;padding:24px;text-align:center}
+.cam-corner{position:absolute;width:26px;height:26px;border-color:var(--orange)}
+.cam-tl{top:16px;left:16px;border-top:2.5px solid;border-left:2.5px solid;border-radius:6px 0 0 0}
+.cam-tr{top:16px;right:16px;border-top:2.5px solid;border-right:2.5px solid;border-radius:0 6px 0 0}
+.cam-bl{bottom:80px;left:16px;border-bottom:2.5px solid;border-left:2.5px solid;border-radius:0 0 0 6px}
+.cam-br{bottom:80px;right:16px;border-bottom:2.5px solid;border-right:2.5px solid;border-radius:0 0 6px 0}
+#camGuides{display:none;position:absolute;inset:0;pointer-events:none}
+.cam-controls{background:rgba(0,0,0,.9);padding:18px 24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:22px}
+.shutter{width:70px;height:70px;border-radius:50%;border:4px solid #fff;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.shutter-inner{width:52px;height:52px;border-radius:50%;background:#fff;transition:transform .1s}
+.shutter:active .shutter-inner{transform:scale(.85)}
+.cam-side-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cam-preview-row{display:none;gap:10px;width:100%}
+.cam-preview-row button{flex:1;padding:13px;border-radius:12px;border:none;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.sig-box{border:2px dashed #CBD5E1;border-radius:12px;background:#FAFBFD;position:relative;transition:border-color .2s}
+.sig-box.active{border-color:var(--orange)}
+.sig-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:#94A3B8;pointer-events:none}
+.sig-canvas{width:100%;height:130px;cursor:crosshair;touch-action:none;display:block}
+.sig-actions{display:flex;gap:8px;margin-top:8px}
+.sig-actions .btn{flex:0 auto;padding:9px 16px;font-size:13px;width:auto}
+.opt-box{border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.opt-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.opt-badge{background:var(--navy);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.link-row{background:#F8FAFC;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;margin-bottom:10px;overflow:hidden}
+.link-text{font-size:11px;color:#64748B;font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-btn{background:var(--orange);border:none;border-radius:8px;padding:5px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit}
+.rem-overlay{position:fixed;inset:0;z-index:200;background:#F0F4FA;overflow-y:auto;display:none}
+.rem-hdr{background:var(--navy);padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0}
+.rem-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;margin-left:auto;cursor:pointer}
+.info-box{background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 14px;display:flex;gap:10px;margin-bottom:14px}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-bottom:12px}
+.info-item label{font-size:10px;color:#94A3B8;font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px}
+.info-item span{font-size:13px;font-weight:600;color:var(--navy)}
+.agree-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;cursor:pointer}
+.agree-row input{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--orange)}
+.cfg-overlay{position:fixed;inset:0;z-index:200;background:#F0F4FA;overflow-y:auto;display:none}
+.cfg-hdr{background:var(--navy);padding:13px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0}
+.success-banner{background:linear-gradient(135deg,var(--green),#15803D);border-radius:16px;padding:22px 20px;text-align:center;color:#fff;margin:0 12px 14px}
+.success-icon{font-size:44px;margin-bottom:10px}
+.success-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.sum-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #F1F5F9}
+.sum-row:last-child{border:none}
+.sum-key{font-size:10px;color:#94A3B8;font-weight:600;text-transform:uppercase;width:80px;flex-shrink:0;padding-top:2px}
+.sum-val{font-size:12px;color:var(--navy);font-weight:600}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1.5px solid}
+.badge-ok{background:#DCFCE7;color:var(--green);border-color:#86EFAC}
+.badge-no{background:#FEF2F2;color:var(--red);border-color:#FECACA}
+#toast{position:fixed;top:16px;right:16px;z-index:999;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;color:#fff;display:none;max-width:260px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.setup-box{background:linear-gradient(135deg,var(--navy),#2A4A7F);border-radius:14px;padding:14px 16px;margin:0 12px 14px;display:flex;gap:10px;align-items:center}
+.setup-box-btn{background:var(--orange);border:none;border-radius:9px;padding:8px 14px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="cfg-overlay" id="cfgOverlay">
+  <div class="cfg-hdr">
+    <div style="width:34px;height:34px;background:var(--orange);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px">&#9881;&#65039;</div>
+    <span style="color:#fff;font-weight:700;font-size:15px">Configura&#231;&#245;es</span>
+    <button onclick="closeConfig()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:22px;margin-left:auto;cursor:pointer">&#10005;</button>
+  </div>
+  <div style="max-width:500px;margin:0 auto;padding:16px">
+    <div class="card" style="margin:0 0 14px">
+      <div class="sec">Logo da Imobili&#225;ria</div>
+      <div style="display:flex;gap:14px;align-items:center">
+        <div id="logoBox" style="width:60px;height:60px;border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden;background:#F8FAFC">&#127962;</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:#64748B;margin-bottom:6px">URL da logo (https://...):</div>
+          <input type="url" id="cfgLogo" placeholder="https://..." oninput="previewLogo(this.value)" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit"/>
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+            <span style="font-size:11px;color:#94A3B8">Ou emoji:</span>
+            <button onclick="setEmoji('&#127968;')" style="font-size:18px;border:none;background:#F1F5F9;border-radius:7px;padding:3px 7px;cursor:pointer">&#127968;</button>
+            <button onclick="setEmoji('&#127962;')" style="font-size:18px;border:none;background:#F1F5F9;border-radius:7px;padding:3px 7px;cursor:pointer">&#127962;</button>
+            <button onclick="setEmoji('&#127969;')" style="font-size:18px;border:none;background:#F1F5F9;border-radius:7px;padding:3px 7px;cursor:pointer">&#127969;</button>
+            <button onclick="setEmoji('&#128273;')" style="font-size:18px;border:none;background:#F1F5F9;border-radius:7px;padding:3px 7px;cursor:pointer">&#128273;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin:0 0 14px">
+      <div class="sec">Dados</div>
+      <div class="field"><label>Nome da Imobili&#225;ria <span class="req">*</span></label><input type="text" id="cfgAgency" placeholder="Ex: Imobili&#225;ria Premium" oninput="updatePreview()"/></div>
+      <div class="field"><label>Nome do Corretor <span class="req">*</span></label><input type="text" id="cfgBroker" placeholder="Ex: Jo&#227;o Silva" oninput="updatePreview()"/></div>
+      <div class="grid2">
+        <div class="field"><label>CRECI</label><input type="text" id="cfgCreci" placeholder="123456-SP"/></div>
+        <div class="field"><label>Telefone</label><input type="text" id="cfgPhone" placeholder="(11) 99999-9999"/></div>
+      </div>
+    </div>
+    <div class="card" id="previewCard" style="margin:0 0 14px;display:none">
+      <div class="sec">Pr&#233;via</div>
+      <div style="background:var(--navy);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px">
+        <div id="prevLogo" style="width:36px;height:36px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">&#127962;</div>
+        <div><div id="prevName" style="color:#fff;font-weight:700;font-size:14px">Imobili&#225;ria</div><div id="prevSub" style="color:rgba(255,255,255,.5);font-size:11px">Corretor</div></div>
+      </div>
+    </div>
+    <div style="padding:0"><button class="btn btn-orange" onclick="saveConfig()">&#10003; Salvar Configura&#231;&#245;es</button></div>
+  </div>
+</div>
+<div class="cam-overlay" id="camOverlay">
+  <div class="cam-bar"><span id="camTitle">&#128247; Enquadre a fachada</span><button onclick="closeCamera()">&#10005;</button></div>
+  <div class="cam-view" id="camView">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <img id="camPreviewImg" src="" alt=""/>
+    <div class="cam-loading" id="camLoading">
+      <span style="font-size:46px">&#128247;</span>
+      <span id="camMsg" style="font-size:14px;font-weight:600">Iniciando c&#226;mera...</span>
+      <span id="camSub" style="font-size:12px;color:rgba(255,255,255,.6)"></span>
+      <button id="camGalleryBtn" onclick="openGallery()" style="display:none;background:var(--orange);border:none;border-radius:11px;padding:12px 22px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px">&#128193; Abrir Galeria</button>
+    </div>
+    <div id="camGuides">
+      <div class="cam-corner cam-tl"></div><div class="cam-corner cam-tr"></div>
+      <div class="cam-corner cam-bl"></div><div class="cam-corner cam-br"></div>
+    </div>
+  </div>
+  <canvas id="camCanvas" style="display:none"></canvas>
+  <input id="galleryInput" type="file" accept="image/*" style="display:none" onchange="onGalleryFile(this)"/>
+  <div class="cam-controls" id="camControls">
+    <button class="cam-side-btn" onclick="closeCamera()">&#10005;</button>
+    <button class="shutter" id="shutterBtn" onclick="takePhoto()"><div class="shutter-inner"></div></button>
+    <button class="cam-side-btn" onclick="flipCamera()">&#128260;</button>
+  </div>
+  <div class="cam-controls cam-preview-row" id="camPreviewRow">
+    <button style="background:rgba(255,255,255,.15);color:#fff" onclick="retakePhoto()">&#8635; Refazer</button>
+    <button style="background:var(--orange);color:#fff" onclick="usePhoto()">&#10003; Usar foto</button>
+  </div>
+</div>
+<div class="rem-overlay" id="remOverlay">
+  <div class="rem-hdr">
+    <div id="remLogo" style="width:34px;height:34px;background:var(--orange);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#127962;</div>
+    <div><div id="remAgency" style="color:#fff;font-weight:700;font-size:14px">Imobili&#225;ria</div><div style="color:rgba(255,255,255,.45);font-size:11px">Assinatura Digital</div></div>
+    <button class="rem-close" onclick="closeRemote()">&#10005;</button>
+  </div>
+  <div style="max-width:500px;margin:0 auto;padding:16px">
+    <div class="info-box"><span style="font-size:20px;flex-shrink:0">&#128737;</span><div><div style="font-weight:700;color:#1E40AF;font-size:13px">Documento com validade jur&#237;dica</div><div style="color:#3B82F6;font-size:12px">Sua assinatura confirma presen&#231;a na visita ao im&#243;vel abaixo.</div></div></div>
+    <div class="card" style="margin:0 0 14px">
+      <div class="sec">Dados da Visita</div>
+      <div class="info-row">
+        <div class="info-item"><label>Cliente</label><span id="rClient">&#8212;</span></div>
+        <div class="info-item"><label>CPF</label><span id="rCpf">&#8212;</span></div>
+        <div class="info-item"><label>Data</label><span id="rDate">&#8212;</span></div>
+        <div class="info-item"><label>Tipo</label><span id="rType">&#8212;</span></div>
+      </div>
+      <div class="info-item" style="margin-bottom:8px"><label>Endere&#231;o</label><span id="rAddr">&#8212;</span></div>
+      <div class="info-item"><label>Corretor / Imobili&#225;ria</label><span id="rBroker">&#8212;</span></div>
+      <div id="rGpsRow" style="display:none;margin-top:10px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:10px;padding:8px 12px;font-size:11px;color:#166534;font-family:monospace"></div>
+      <div id="rPhotoRow" style="display:none;margin-top:10px"><div style="font-size:10px;color:#94A3B8;font-weight:600;text-transform:uppercase;margin-bottom:6px">Foto da fachada</div><img id="rPhoto" src="" style="width:100%;height:130px;object-fit:cover;border-radius:10px"/></div>
+    </div>
+    <label class="agree-row"><input type="checkbox" id="remAgree"/><span style="font-size:12px;color:#475569;line-height:1.6" id="remAgreeText">Declaro que visitei o im&#243;vel acima descrito, acompanhado pelo corretor indicado.</span></label>
+    <div class="card" style="margin:0 0 12px">
+      <div class="sec">Assinatura do Cliente</div>
+      <div class="sig-box" id="remSigBox"><div class="sig-hint" id="remSigHint">&#9997;&#65039; Assine aqui com o dedo ou mouse</div><canvas class="sig-canvas" id="remSigCanvas" width="700" height="160"></canvas></div>
+      <div class="sig-actions"><button class="btn btn-ghost" onclick="clearRemSig()">&#8635; Limpar</button><button class="btn btn-green" id="remConfirmBtn" onclick="confirmRemoteSig()" style="opacity:.4;pointer-events:none">&#10003; Confirmar</button></div>
+    </div>
+    <p style="text-align:center;font-size:11px;color:#94A3B8;padding-bottom:20px">&#128274; Criptografado &#183; LGPD</p>
+  </div>
+</div>
+<div id="mainApp">
+  <div class="topbar">
+    <div class="topbar-icon" id="topIcon">&#128737;</div>
+    <div><div class="topbar-title" id="topName">VisitaSegura</div><div class="topbar-sub" id="topSub" style="display:none"></div></div>
+    <button class="cfg-btn" onclick="openConfig()">&#9881;&#65039; Config</button>
+  </div>
+  <div id="setupBox" class="setup-box" style="display:none">
+    <span style="font-size:22px">&#128161;</span>
+    <div style="flex:1"><div style="color:#fff;font-weight:700;font-size:13px">Configure sua imobili&#225;ria primeiro</div><div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:2px">Nome, logo e corretor para os documentos.</div></div>
+    <button class="setup-box-btn" onclick="openConfig()">Configurar &#8594;</button>
+  </div>
+  <div class="steps" id="stepsEl"></div>
+  <div id="step0">
+    <div class="card">
+      <div class="sec">&#128100; Dados do Cliente e Im&#243;vel</div>
+      <div class="field"><label>Nome completo <span class="req">*</span></label><input type="text" id="fName" placeholder="Jo&#227;o da Silva" autocomplete="off"/></div>
+      <div class="grid2">
+        <div class="field"><label>CPF <span class="req">*</span></label><input type="text" id="fCpf" placeholder="000.000.000-00" inputmode="numeric"/></div>
+        <div class="field"><label>Telefone <span class="req">*</span></label><input type="text" id="fPhone" placeholder="(11) 99999-9999" inputmode="tel"/></div>
+      </div>
+      <div class="field"><label>E-mail</label><input type="email" id="fEmail" placeholder="cliente@email.com" inputmode="email"/></div>
+      <div class="field"><label>Tipo de im&#243;vel <span class="req">*</span></label><select id="fType"><option>Apartamento</option><option>Casa</option><option>Cobertura</option><option>Studio</option><option>Terreno</option><option>Sala Comercial</option><option>Loja</option><option>Galp&#227;o</option></select></div>
+      <div class="field"><label>Endere&#231;o do im&#243;vel <span class="req">*</span></label><input type="text" id="fAddress" placeholder="Rua, n&#250;mero, bairro, cidade, UF" autocomplete="off"/></div>
+      <div class="field"><label>Observa&#231;&#245;es</label><textarea id="fNotes" placeholder="Informa&#231;&#245;es adicionais..."></textarea></div>
+      <div class="errbox" id="err0"></div>
+      <button class="btn btn-navy" onclick="nextStep0()" style="margin-top:4px">Pr&#243;ximo: Evid&#234;ncias &#8594;</button>
+    </div>
+  </div>
+  <div id="step1" style="display:none">
+    <div class="card">
+      <div class="sec">&#128205; GPS e Foto da Fachada</div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Localiza&#231;&#227;o GPS</div>
+        <div id="gpsArea"><div class="gps-btn-area" onclick="captureGPS()"><div style="font-size:32px">&#128205;</div><p>Capturar localiza&#231;&#227;o GPS</p><small>Toque para registrar sua posi&#231;&#227;o atual</small></div></div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Foto da Fachada</div>
+        <div id="photoArea"><div class="photo-btn-area" onclick="openCamera()"><div class="photo-icon-big">&#128247;</div><p style="font-size:14px;font-weight:600;color:var(--orange)">Tirar foto da fachada</p><p style="font-size:12px;color:#94A3B8;margin-top:4px">Toque para abrir a c&#226;mera</p></div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" onclick="goStep(0)" style="flex:0 auto;padding:12px 18px">&#8592; Voltar</button>
+        <button class="btn btn-navy" onclick="goStep(2)" style="flex:1">Pr&#243;ximo: Assinatura &#8594;</button>
+      </div>
+    </div>
+  </div>
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="sec">&#9997;&#65039; Assinatura do Cliente</div>
+      <p style="font-size:13px;color:#64748B;margin-bottom:14px">Escolha como coletar a assinatura:</p>
+      <div class="opt-box">
+        <div class="opt-label"><span class="opt-badge">A</span> Assinar aqui (presencial)</div>
+        <div class="sig-box" id="sigBox"><div class="sig-hint" id="sigHint">&#9997;&#65039; Assine aqui com o dedo ou mouse</div><canvas class="sig-canvas" id="sigCanvas" width="700" height="160"></canvas></div>
+        <div class="sig-actions"><button class="btn btn-ghost" onclick="clearSig()">&#8635; Limpar</button><button class="btn btn-green" id="sigConfirmBtn" onclick="confirmSig()" style="opacity:.4;pointer-events:none">&#10003; Confirmar</button></div>
+      </div>
+      <div class="opt-box">
+        <div class="opt-label"><span class="opt-badge">B</span> Enviar link para o cliente assinar</div>
+        <p style="font-size:12px;color:#64748B;margin-bottom:10px">O cliente abre o link no celular e assina.</p>
+        <div class="link-row"><span style="font-size:14px;flex-shrink:0">&#128279;</span><span class="link-text" id="shareLink">https://visitasegura.com.br/assinar/XXXXXXXX</span><button class="copy-btn" onclick="copyLink()">Copiar</button></div>
+        <div class="btn-row"><button class="btn btn-wa" onclick="sendWhatsApp()">&#128172; WhatsApp</button><button class="btn btn-blue" onclick="sendEmail()">&#9993;&#65039; E-mail</button></div>
+        <button class="btn btn-ghost" onclick="openRemote()" style="font-size:13px;padding:11px">&#128065; Ver tela do cliente</button>
+      </div>
+      <button class="btn btn-ghost" onclick="goStep(1)" style="margin-top:4px;padding:12px">&#8592; Voltar</button>
+    </div>
+  </div>
+  <div id="step3" style="display:none">
+    <div class="success-banner"><div class="success-icon">&#9989;</div><div class="success-title">Visita Registrada!</div><div id="sucClient" style="font-size:13px;opacity:.85"></div><div id="sucAddr" style="font-size:12px;opacity:.6;margin-top:2px"></div></div>
+    <div class="card"><div class="sec">Resumo</div><div id="sumRows"></div><div class="badges" id="sumBadges"></div></div>
+    <div class="card">
+      <div class="sec">A&#231;&#245;es</div>
+      <button class="btn btn-navy" onclick="doPrint()" style="margin-bottom:10px;font-size:14px;padding:14px">&#128196; Gerar / Imprimir PDF</button>
+      <div class="btn-row"><button class="btn btn-wa" onclick="shareWA()">&#128172; WhatsApp</button><button class="btn btn-blue" onclick="shareEM()">&#9993;&#65039; E-mail</button></div>
+      <p style="font-size:11px;color:#94A3B8;margin-top:10px;text-align:center;line-height:1.5">O PDF abre para impressÃ£o/download.</p>
+    </div>
+    <div style="padding:0 12px 20px"><button class="btn btn-outline" onclick="resetAll()">&#8635; Nova Visita</button></div>
+  </div>
+</div>
+<script>
+var S={gps:null,photo:null,photoTime:null,sig:null,sigAt:null};
+var CFG={};
+var emojiLogo='&#127962;';
+var camStream=null,camFacing='environment',snapData=null;
+var sigHas=false,rSigHas=false;
+var fmtDate=function(){return new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});};
+var fmtTime=function(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});};
+var fmtFull=function(){return new Date().toLocaleString('pt-BR');};
+var randId=function(){return Math.random().toString(36).slice(2,10).toUpperCase();};
+var gv=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+var el=function(id){return document.getElementById(id);};
+window.onload=function(){
+  try{CFG=JSON.parse(localStorage.getItem('vsconf')||'{}');}catch(e){}
+  updateTopbar();renderSteps(0);
+  initSig('sigCanvas','sigBox','sigHint','sigConfirmBtn',function(has){sigHas=has;el('sigConfirmBtn').style.opacity=has?'1':'0.4';el('sigConfirmBtn').style.pointerEvents=has?'auto':'none';});
+  initSig('remSigCanvas','remSigBox','remSigHint','remConfirmBtn',function(has){rSigHas=has;el('remConfirmBtn').style.opacity=has?'1':'0.4';el('remConfirmBtn').style.pointerEvents=has?'auto':'none';});
+  el('shareLink').textContent='https://visitasegura.com.br/assinar/'+randId();
+  if(!CFG.agency){el('setupBox').style.display='flex';}
+};
+function updateTopbar(){
+  if(CFG.agency){el('topName').textContent=CFG.agency;el('topSub').style.display='block';el('topSub').textContent=CFG.broker||'';el('setupBox').style.display='none';
+    if(CFG.logo&&CFG.logo.startsWith('http')){el('topIcon').innerHTML='<img src="'+CFG.logo+'" style="width:26px;height:26px;object-fit:contain;border-radius:5px"/>';}
+    else{el('topIcon').textContent=CFG.logoEmoji||'&#128737;';el('topIcon').style.fontSize='20px';}}
+}
+function renderSteps(n){
+  var labels=['Dados','Evid&#234;ncias','Assinatura','Pronto'],html='';
+  for(var i=0;i<labels.length;i++){
+    var cls=n>i?'done':n===i?'active':'idle',icon=n>i?'&#10003;':(i+1);
+    html+='<div class="step"><div class="step-dot '+cls+'">'+icon+'</div><div class="step-lbl'+(n===i?' active':'')+'" >'+labels[i]+'</div></div>';
+    if(i<labels.length-1)html+='<div class="step-line '+(n>i?'done':'idle')+'"></div>';
+  }
+  el('stepsEl').innerHTML=html;
+}
+function goStep(n){for(var i=0;i<4;i++)el('step'+i).style.display=i===n?'block':'none';renderSteps(n);window.scrollTo(0,0);}
+function nextStep0(){
+  var errors=[];
+  if(!gv('fName'))errors.push('&#183; Nome completo Ã© obrigatÃ³rio');
+  if(!gv('fCpf'))errors.push('&#183; CPF Ã© obrigatÃ³rio');
+  if(!gv('fPhone'))errors.push('&#183; Telefone Ã© obrigatÃ³rio');
+  if(!gv('fAddress'))errors.push('&#183; EndereÃ§o do imÃ³vel Ã© obrigatÃ³rio');
+  if(errors.length){var box=el('err0');box.innerHTML='<b>Preencha os campos:</b><br>'+errors.join('<br>');box.style.display='block';return;}
+  el('err0').style.display='none';goStep(1);
+}
+function captureGPS(){
+  el('gpsArea').innerHTML='<div class="gps-btn-area"><div style="font-size:30px">&#9203;</div><p>Obtendo localizaÃ§Ã£o...</p></div>';
+  function setGPS(lat,lng){
+    S.gps={lat:lat,lng:lng,time:fmtFull()};
+    el('gpsArea').innerHTML='<div class="gps-ok"><div class="gps-ok-icon">&#128205;</div><div><div style="font-weight:700;color:var(--green);font-size:12px">GPS Capturado &#10003;</div><div style="font-family:monospace;font-size:11px;color:#166534">'+lat+', '+lng+'</div><div style="font-size:10px;color:#94A3B8">'+fmtFull()+'</div></div><button onclick="resetGPS()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:#94A3B8">&#10005;</button></div>';
+  }
+  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){setGPS(p.coords.latitude.toFixed(6),p.coords.longitude.toFixed(6));},function(){setGPS((-23.5505+(Math.random()-.5)*.01).toFixed(6),(-46.6333+(Math.random()-.5)*.01).toFixed(6));},{timeout:6000});}
+  else{setTimeout(function(){setGPS('-23.550520','-46.633308');},1000);}
+}
+function resetGPS(){S.gps=null;el('gpsArea').innerHTML='<div class="gps-btn-area" onclick="captureGPS()"><div style="font-size:32px">&#128205;</div><p>Capturar localizaÃ§Ã£o GPS</p><small>Toque para registrar sua posiÃ§Ã£o atual</small></div>';}
+function openCamera(){
+  snapData=null;var ov=el('camOverlay');ov.style.display='flex';
+  el('camTitle').textContent='&#128247; Enquadre a fachada';el('camVideo').style.display='none';el('camPreviewImg').style.display='none';el('camGuides').style.display='none';
+  el('camLoading').style.display='flex';el('camMsg').textContent='Iniciando cÃ¢mera...';el('camSub').textContent='';el('camGalleryBtn').style.display='none';
+  el('camControls').style.display='flex';el('camPreviewRow').style.display='none';el('shutterBtn').disabled=true;el('shutterBtn').style.opacity='.4';startCam();
+}
+function startCam(){
+  if(camStream){camStream.getTracks().forEach(function(t){t.stop();});camStream=null;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camError('CÃ¢mera nÃ£o suportada.');return;}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:camFacing},width:{ideal:1280},height:{ideal:720}}})
+  .then(function(stream){camStream=stream;var vid=el('camVideo');vid.srcObject=stream;vid.play().then(function(){vid.style.display='block';el('camLoading').style.display='none';el('camGuides').style.display='block';el('shutterBtn').disabled=false;el('shutterBtn').style.opacity='1';});})
+  .catch(function(err){if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError'){camError('PermissÃ£o negada.','Permita o acesso nas configuraÃ§Ãµes ou use a galeria.');}else{camError('CÃ¢mera indisponÃ­vel.','Use a opÃ§Ã£o de galeria abaixo.');}});
+}
+function camError(msg,sub){el('camMsg').textContent=msg;el('camSub').textContent=sub||'';el('camGalleryBtn').style.display='block';}
+function flipCamera(){camFacing=camFacing==='environment'?'user':'environment';el('camLoading').style.display='flex';el('camMsg').textContent='Trocando cÃ¢mera...';el('camSub').textContent='';el('camGalleryBtn').style.display='none';el('camVideo').style.display='none';el('camGuides').style.display='none';el('shutterBtn').disabled=true;el('shutterBtn').style.opacity='.4';startCam();}
+function takePhoto(){
+  var vid=el('camVideo'),cnv=el('camCanvas');cnv.width=vid.videoWidth||1280;cnv.height=vid.videoHeight||720;
+  var ctx=cnv.getContext('2d');ctx.drawImage(vid,0,0,cnv.width,cnv.height);
+  var bh=Math.round(cnv.height*.06);ctx.fillStyle='rgba(0,0,0,0.65)';ctx.fillRect(0,cnv.height-bh,cnv.width,bh);
+  ctx.fillStyle='#E8820C';ctx.font='bold '+Math.round(bh*.4)+'px monospace';ctx.fillText('GPS',12,cnv.height-Math.round(bh*.2));
+  ctx.fillStyle='rgba(255,255,255,.9)';ctx.font=Math.round(bh*.36)+'px monospace';
+  var lat=S.gps?S.gps.lat:'--',lng=S.gps?S.gps.lng:'--';
+  ctx.fillText(lat+', '+lng+'   '+new Date().toLocaleTimeString('pt-BR'),82,cnv.height-Math.round(bh*.2));
+  snapData=cnv.toDataURL('image/jpeg',.92);
+  if(camStream){camStream.getTracks().forEach(function(t){t.stop();});camStream=null;}
+  el('camPreviewImg').src=snapData;el('camPreviewImg').style.display='block';el('camVideo').style.display='none';el('camGuides').style.display='none';el('camControls').style.display='none';el('camPreviewRow').style.display='flex';el('camTitle').textContent='Confirmar foto';
+}
+function retakePhoto(){snapData=null;el('camPreviewImg').style.display='none';el('camControls').style.display='flex';el('camPreviewRow').style.display='none';el('camTitle').textContent='Enquadre a fachada';el('camLoading').style.display='flex';el('camMsg').textContent='Reiniciando...';el('camSub').textContent='';el('camGalleryBtn').style.display='none';el('shutterBtn').disabled=true;el('shutterBtn').style.opacity='.4';startCam();}
+function usePhoto(){S.photo=snapData;S.photoTime=fmtFull();closeCamera();el('photoArea').innerHTML='<div class="photo-preview"><img src="'+S.photo+'" alt="Fachada"/><div class="photo-meta">GPS '+(S.gps?S.gps.lat+', '+S.gps.lng:'--')+'  '+S.photoTime+'</div><button onclick="resetPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(220,38,38,.9);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;line-height:1">&#10005;</button></div>';toast('Foto salva!',true);}
+function closeCamera(){if(camStream){camStream.getTracks().forEach(function(t){t.stop();});camStream=null;}el('camOverlay').style.display='none';}
+function openGallery(){el('galleryInput').click();}
+function onGalleryFile(inp){var file=inp.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){snapData=e.target.result;el('camPreviewImg').src=snapData;el('camPreviewImg').style.display='block';el('camLoading').style.display='none';el('camVideo').style.display='none';el('camGuides').style.display='none';el('camControls').style.display='none';el('camPreviewRow').style.display='flex';el('camTitle').textContent='Confirmar foto';};reader.readAsDataURL(file);inp.value='';}
+function resetPhoto(){S.photo=null;el('photoArea').innerHTML='<div class="photo-btn-area" onclick="openCamera()"><div class="photo-icon-big">&#128247;</div><p style="font-size:14px;font-weight:600;color:var(--orange)">Tirar foto da fachada</p><p style="font-size:12px;color:#94A3B8;margin-top:4px">Toque para abrir a cÃ¢mera</p></div>';}
+function initSig(canvasId,boxId,hintId,btnId,onChange){
+  var canvas=document.getElementById(canvasId),drawing=false;
+  function pt(e){var r=canvas.getBoundingClientRect(),src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(canvas.width/r.width),y:(src.clientY-r.top)*(canvas.height/r.height)};}
+  function start(e){e.preventDefault();var p=pt(e),ctx=canvas.getContext('2d');ctx.beginPath();ctx.moveTo(p.x,p.y);drawing=true;document.getElementById(hintId).style.display='none';document.getElementById(boxId).classList.add('active');onChange(true);}
+  function move(e){e.preventDefault();if(!drawing)return;var p=pt(e),ctx=canvas.getContext('2d');ctx.strokeStyle='#1B2E4B';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineTo(p.x,p.y);ctx.stroke();}
+  function stop(){drawing=false;}
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',start,{passive:false});canvas.addEventListener('touchmove',move,{passive:false});canvas.addEventListener('touchend',stop);
+}
+function clearSig(){el('sigCanvas').getContext('2d').clearRect(0,0,700,160);sigHas=false;el('sigHint').style.display='flex';el('sigBox').classList.remove('active');el('sigConfirmBtn').style.opacity='.4';el('sigConfirmBtn').style.pointerEvents='none';}
+function confirmSig(){S.sig=el('sigCanvas').toDataURL();S.sigAt=fmtFull();finish();}
+function clearRemSig(){el('remSigCanvas').getContext('2d').clearRect(0,0,700,160);rSigHas=false;el('remSigHint').style.display='flex';el('remSigBox').classList.remove('active');el('remConfirmBtn').style.opacity='.4';el('remConfirmBtn').style.pointerEvents='none';}
+function confirmRemoteSig(){
+  if(!el('remAgree').checked){toast('Marque o termo.',false);return;}
+  S.sig=el('remSigCanvas').toDataURL();S.sigAt=fmtFull();
+  el('remOverlay').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#F0F4FA"><div style="text-align:center"><div style="font-size:60px;margin-bottom:14px">&#9989;</div><h2 style="font-size:22px;font-weight:800;color:var(--navy);margin-bottom:8px">Assinado!</h2><p style="color:#64748B;font-size:14px;margin-bottom:20px">Visita confirmada.</p><button onclick="closeRemote()" style="background:var(--navy);border:none;border-radius:12px;padding:12px 28px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">Fechar</button></div></div>';
+  setTimeout(function(){closeRemote();finish();},2200);
+}
+function openRemote(){
+  el('rClient').textContent=gv('fName')||'--';el('rCpf').textContent=gv('fCpf')||'--';el('rDate').textContent=fmtDate();el('rType').textContent=(el('fType')||{}).value||'--';el('rAddr').textContent=gv('fAddress')||'--';el('rBroker').textContent=(CFG.broker||'Corretor')+' - '+(CFG.agency||'ImobiliÃ¡ria');
+  el('remAgency').textContent=CFG.agency||'ImobiliÃ¡ria';
+  el('remAgreeText').textContent='Declaro que visitei o imÃ³vel acima, acompanhado(a) pelo corretor '+(CFG.broker||'indicado')+' da '+(CFG.agency||'imobiliÃ¡ria')+'. Estou ciente que este documento tem validade jurÃ­dica.';
+  if(CFG.logo&&CFG.logo.startsWith('http')){el('remLogo').innerHTML='<img src="'+CFG.logo+'" style="width:30px;height:30px;object-fit:contain;border-radius:5px"/>';}else{el('remLogo').textContent=CFG.logoEmoji||'&#127962;';}
+  var gpsRow=el('rGpsRow');if(S.gps){gpsRow.style.display='block';gpsRow.textContent='GPS '+S.gps.lat+', '+S.gps.lng+' - '+S.gps.time;}
+  var pRow=el('rPhotoRow');if(S.photo){pRow.style.display='block';el('rPhoto').src=S.photo;}
+  clearRemSig();el('remOverlay').style.display='block';el('remOverlay').scrollTop=0;
+}
+function closeRemote(){el('remOverlay').style.display='none';}
+function finish(){
+  el('sucClient').textContent=gv('fName')+' - '+fmtDate();el('sucAddr').textContent=gv('fAddress');
+  var rows=[['Cliente',gv('fName')],['CPF',gv('fCpf')],['Telefone',gv('fPhone')],['ImÃ³vel',(el('fType').value||'')+' - '+gv('fAddress')],['Corretor',CFG.broker||'--'],['ImobiliÃ¡ria',CFG.agency||'--'],['Data',fmtDate()+' Ã s '+fmtTime()]];
+  el('sumRows').innerHTML=rows.map(function(r){return '<div class="sum-row"><span class="sum-key">'+r[0]+'</span><span class="sum-val">'+r[1]+'</span></div>';}).join('');
+  var checks=[[!!S.gps,'GPS'],[!!S.photo,'Foto'],[!!S.sig,'Assinatura'],[!!(CFG.agency&&CFG.broker),'ImobiliÃ¡ria']];
+  el('sumBadges').innerHTML=checks.map(function(c){return '<span class="badge '+(c[0]?'badge-ok':'badge-no')+'">'+(c[0]?'&#10003;':'&#10007;')+' '+c[1]+'</span>';}).join('');
+  goStep(3);toast('Visita registrada!',true);
+}
+function doPrint(){
+  var hash=randId()+randId();
+  var logo=(CFG.logo&&CFG.logo.startsWith('http'))? '<img src="'+CFG.logo+'" style="height:50px;width:50px;object-fit:contain;border-radius:8px"/>':'<div style="width:50px;height:50px;background:#E8820C;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:24px">'+(CFG.logoEmoji||'&#127962;')+'</div>';
+  var photo=S.photo?'<div style="margin:16px 0"><div style="font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">FOTO DA FACHADA</div><img src="'+S.photo+'" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;border:1.5px solid #E2E8F0"/>'+(S.gps?'<div style="font-size:9px;color:#64748B;margin-top:3px">GPS: '+S.gps.lat+', '+S.gps.lng+' - '+S.photoTime+'</div>':'')+'</div>':'';
+  var sig=S.sig?'<div style="margin-top:20px;padding-top:16px;border-top:1px solid #E2E8F0"><div style="font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">ASSINATURA DIGITAL</div><div style="border:1.5px solid #E2E8F0;border-radius:8px;padding:4px;display:inline-block;background:#FAFBFD"><img src="'+S.sig+'" style="height:70px;max-width:280px;object-fit:contain;display:block"/></div><div style="font-size:9px;color:#94A3B8;margin-top:4px">Assinado em: '+S.sigAt+'</div></div>':'';
+  var html='<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><title>Termo de Visita</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,sans-serif;color:#1B2E4B;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pg{max-width:740px;margin:0 auto;padding:36px 44px}.hdr{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:3px solid #1B2E4B;margin-bottom:20px}.hdr-text h1{font-size:18px;font-weight:800;color:#1B2E4B}.hdr-text p{font-size:10px;color:#64748B;margin-top:2px}.badge{margin-left:auto;background:#1B2E4B;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase}.ttl{text-align:center;margin-bottom:20px}.ttl h2{font-size:16px;font-weight:800;color:#1B2E4B}.ttl p{font-size:10px;color:#64748B;margin-top:3px}.sec{font-size:9px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;background:#F1F5F9;padding:4px 8px;margin-bottom:10px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-bottom:16px}.f label{font-size:9px;color:#94A3B8;font-weight:600;text-transform:uppercase;display:block;margin-bottom:2px}.f span{font-size:12px;font-weight:600;color:#1B2E4B}.gps{background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:10px;color:#166534;margin-bottom:14px}.hash{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px 12px;font-family:monospace;font-size:9px;color:#475569;margin-top:18px}.foot{margin-top:24px;padding-top:12px;border-top:1px solid #E2E8F0;display:flex;justify-content:space-between}.foot p{font-size:9px;color:#94A3B8}@media print{.pg{padding:18px 24px}}</style></head><body><div class="pg"><div class="hdr">'+logo+'<div class="hdr-text"><h1>'+(CFG.agency||'ImobiliÃ¡ria')+'</h1><p>Corretor: '+(CFG.broker||'--')+(CFG.creci?' - CRECI: '+CFG.creci:'')+'</p></div><div class="badge">Documento Oficial</div></div><div class="ttl"><h2>TERMO DE REGISTRO DE VISITA IMOBILIÃRIA</h2><p>Gerado em '+fmtFull()+' - Lei 11.419/2006</p></div><div class="sec">DADOS DO CLIENTE</div><div class="g2"><div class="f"><label>Nome</label><span>'+gv('fName')+'</span></div><div class="f"><label>CPF</label><span>'+gv('fCpf')+'</span></div><div class="f"><label>Telefone</label><span>'+gv('fPhone')+'</span></div><div class="f"><label>E-mail</label><span>'+(gv('fEmail')||'--')+'</span></div></div><div class="sec">DADOS DO IMÃVEL</div><div class="g2"><div class="f"><label>Tipo</label><span>'+(el('fType').value)+'</span></div><div class="f"><label>Data</label><span>'+fmtDate()+' Ã s '+fmtTime()+'</span></div><div class="f" style="grid-column:span 2"><label>EndereÃ§o</label><span>'+gv('fAddress')+'</span></div>'+(gv('fNotes')?'<div class="f" style="grid-column:span 2"><label>ObservaÃ§Ãµes</label><span>'+gv('fNotes')+'</span></div>':'')+'</div>'+(S.gps?'<div class="gps">GPS: '+S.gps.lat+', '+S.gps.lng+' - '+S.gps.time+'</div>':'')+photo+sig+'<div class="hash">Hash: '+hash+'</div><div class="foot"><p>VisitaSegura - Lei 11.419/2006</p><p style="font-weight:700;color:#E8820C">VisitaSegura</p></div></div><\/script></body></html>';
+  html = html.replace('<\/script>', '<scr'+'ipt>window.onload=function(){window.print();}<\/scr'+'ipt>');
+  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();}else{toast('Permita pop-ups.',false);}
+}
+function sendWhatsApp(){var phone=gv('fPhone').replace(/\D/g,''),link=el('shareLink').textContent,name=gv('fName')||'cliente',msg=encodeURIComponent('OlÃ¡ '+name+'! Acesse o link para assinar o comprovante de visita:\n\n'+link);window.open('https://wa.me/55'+phone+'?text='+msg,'_blank');}
+function sendEmail(){var email=gv('fEmail'),link=el('shareLink').textContent,subject=encodeURIComponent('Assine sua visita - '+gv('fAddress')),body=encodeURIComponent('OlÃ¡ '+gv('fName')+'!\n\nAcesse o link para assinar o comprovante de visita:\n\n'+link);window.location.href='mailto:'+email+'?subject='+subject+'&body='+body;}
+function shareWA(){var phone=gv('fPhone').replace(/\D/g,''),name=gv('fName')||'cliente',addr=gv('fAddress'),msg=encodeURIComponent('OlÃ¡ '+name+'! Segue o comprovante de visita.\nImÃ³vel: '+addr+'\nData: '+fmtDate()+'\nCorretor: '+(CFG.broker||'--'));window.open('https://wa.me/55'+phone+'?text='+msg,'_blank');}
+function shareEM(){var email=gv('fEmail'),subject=encodeURIComponent('Comprovante de Visita - '+gv('fAddress')),body=encodeURIComponent('OlÃ¡ '+gv('fName')+'!\n\nSegue o comprovante da sua visita imobiliÃ¡ria.\nImÃ³vel: '+gv('fAddress')+'\nData: '+fmtDate()+'\nCorretor: '+(CFG.broker||'--'));window.location.href='mailto:'+email+'?subject='+subject+'&body='+body;}
+function openConfig(){el('cfgAgency').value=CFG.agency||'';el('cfgBroker').value=CFG.broker||'';el('cfgCreci').value=CFG.creci||'';el('cfgPhone').value=CFG.phone||'';el('cfgLogo').value=(CFG.logo&&CFG.logo.startsWith('http'))?CFG.logo:'';emojiLogo=CFG.logoEmoji||'&#127962;';previewLogo(CFG.logo||'');updatePreview();el('cfgOverlay').style.display='block';}
+function closeConfig(){el('cfgOverlay').style.display='none';}
+function previewLogo(url){var box=el('logoBox');if(url&&url.startsWith('http')){box.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:contain"/>';}else{box.textContent=emojiLogo;box.style.fontSize='28px';}updatePreview();}
+function setEmoji(e){emojiLogo=e;el('cfgLogo').value='';el('logoBox').textContent=e;el('logoBox').style.fontSize='28px';updatePreview();}
+function updatePreview(){var a=el('cfgAgency').value.trim(),b=el('cfgBroker').value.trim(),cr=el('cfgCreci').value.trim(),url=el('cfgLogo').value.trim();if(a||b){el('previewCard').style.display='block';el('prevName').textContent=a||'ImobiliÃ¡ria';el('prevSub').textContent=(b||'Corretor')+(cr?' - CRECI: '+cr:'');var pl=el('prevLogo');if(url&&url.startsWith('http')){pl.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:contain"/>';}else{pl.textContent=emojiLogo;pl.style.fontSize='20px';}}}
+function saveConfig(){var url=el('cfgLogo').value.trim();CFG={agency:el('cfgAgency').value.trim(),broker:el('cfgBroker').value.trim(),creci:el('cfgCreci').value.trim(),phone:el('cfgPhone').value.trim(),logo:url,logoEmoji:emojiLogo};try{localStorage.setItem('vsconf',JSON.stringify(CFG));}catch(e){}updateTopbar();closeConfig();toast('ConfiguraÃ§Ãµes salvas!',true);}
+function copyLink(){var txt=el('shareLink').textContent;if(navigator.clipboard){navigator.clipboard.writeText(txt).catch(function(){});}toast('Link copiado!',true);}
+function toast(msg,ok){var t=el('toast');t.textContent=(ok?'ok: ':' ')+ msg;t.style.background=ok?'var(--green)':'var(--red)';t.style.display='block';clearTimeout(window._t);window._t=setTimeout(function(){t.style.display='none';},3000);}
+function resetAll(){S={gps:null,photo:null,photoTime:null,sig:null,sigAt:null};['fName','fCpf','fPhone','fEmail','fNotes'].forEach(function(id){el(id).value='';});el('fType').value='Apartamento';el('err0').style.display='none';resetGPS();resetPhoto();clearSig();clearRemSig();el('shareLink').textContent='https://visitasegura.com.br/assinar/'+randId();goStep(0);}
+</script>
+</body>
+</html>
