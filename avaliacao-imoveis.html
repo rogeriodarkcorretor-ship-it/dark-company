@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Avaliação de Imóveis — Piracicaba</title>
+  <title>Avaliação de Imóveis — Venda e Locação — Piracicaba</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -109,6 +109,40 @@
       height: 1px;
       background: #2e2820;
       margin: 24px 0;
+    }
+
+    /* ── TOGGLE VENDA / LOCAÇÃO ── */
+    .modalidade-toggle {
+      display: flex;
+      background: #221e18;
+      border: 1px solid #2e2820;
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .modo-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #8a7f74;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 8px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .modo-btn:hover:not(.active) { color: var(--cream); }
+
+    .modo-btn.active {
+      background: var(--gold);
+      color: var(--ink);
+      font-weight: 700;
     }
 
     .sidebar-label {
@@ -547,6 +581,8 @@
     .tag-alto   { background: #fee2cc; color: #a83820; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
     .tag-medio  { background: #fef3cc; color: #8a5a00; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
     .tag-padrao { background: var(--green-lt); color: var(--green); padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+    .tag-venda    { background: #e6edff; color: #2a3e8c; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
+    .tag-locacao  { background: #f0e6ff; color: #6a2a8c; padding: 3px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
 
     /* ── ANIMATIONS ── */
     .fade-in { animation: fadeUp 0.5s ease both; }
@@ -577,13 +613,18 @@
     <div class="sidebar-logo">Piracicaba · SP · 2026</div>
 
     <h1>Avaliação<br><em>Imóvel</em></h1>
-    <p class="tagline">Estimativa inteligente de valor de mercado baseada em dados reais da cidade.</p>
+    <p class="tagline" id="tagline-text">Estimativa inteligente de valor de mercado baseada em dados reais da cidade.</p>
+
+    <div class="modalidade-toggle" id="modalidade-toggle">
+      <button type="button" class="modo-btn active" data-modo="venda" onclick="trocarModalidade('venda')">Venda</button>
+      <button type="button" class="modo-btn" data-modo="locacao" onclick="trocarModalidade('locacao')">Locação</button>
+    </div>
 
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Resultado</div>
 
     <div class="metric-box">
-      <div class="label">VALOR ESTIMADO</div>
+      <div class="label" id="sb-valor-label">VALOR ESTIMADO</div>
       <div class="value" id="sb-valor">—</div>
       <div class="sub" id="sb-sub">Preencha os dados ao lado</div>
       <div class="faixa-bar"><div class="faixa-fill" id="faixa-fill"></div></div>
@@ -595,7 +636,7 @@
     </div>
 
     <div class="metric-box">
-      <div class="label">VALOR POR M²</div>
+      <div class="label" id="sb-m2-label">VALOR POR M²</div>
       <div class="value" id="sb-m2">—</div>
     </div>
 
@@ -726,6 +767,13 @@
           <option value="Não">Não</option>
         </select>
       </div>
+      <div class="field" id="campo-mobiliado" style="display:none">
+        <label>Mobiliado (locação)</label>
+        <select id="mobiliado" onchange="calcular()">
+          <option value="Não">Não</option>
+          <option value="Sim">Sim</option>
+        </select>
+      </div>
       <div class="field">
         <label>Ano de Construção</label>
         <input type="number" id="ano" placeholder="Ex: 2005" min="1950" max="2026" oninput="calcular()" />
@@ -780,6 +828,11 @@
         <div class="calc-val" id="c-piscina">—</div>
         <div class="calc-unit">mult.</div>
       </div>
+      <div class="calc-row" id="row-mobiliado" style="display:none">
+        <div class="calc-label">Ajuste mobiliado</div>
+        <div class="calc-val" id="c-mobiliado">—</div>
+        <div class="calc-unit">mult.</div>
+      </div>
       <div class="calc-row" id="row-idade">
         <div class="calc-label">Ajuste idade do imóvel</div>
         <div class="calc-val" id="c-idade">—</div>
@@ -795,12 +848,20 @@
         <div class="calc-val" id="c-m2">—</div>
         <div class="calc-unit">m²</div>
       </div>
+      <div class="calc-row" id="row-rentabilidade" style="display:none">
+        <div class="calc-label">Índice de rentabilidade (aluguel/venda)</div>
+        <div class="calc-val" id="c-rentabilidade">—</div>
+        <div class="calc-unit">%/mês</div>
+      </div>
       <div class="calc-row total">
-        <div class="calc-label">💰 Valor Total Estimado</div>
+        <div class="calc-label" id="c-total-label">💰 Valor Total Estimado</div>
         <div class="calc-val" id="c-total">—</div>
         <div class="calc-unit" id="c-faixa-small" style="font-size:10px;color:#5a5048;line-height:1.4">—</div>
       </div>
     </div>
+    <p id="nota-rentabilidade" style="display:none;font-size:11px;color:var(--muted);margin:-2px 0 8px;line-height:1.5">
+      * Índice de rentabilidade estimado com base em padrões usuais de mercado para Piracicaba (aluguel como % do valor de venda). Sujeito a confirmação com pesquisa de comparáveis reais da região.
+    </p>
 
     <!-- MENSAGEM WHATSAPP -->
     <div class="sec-header" style="margin-top:36px">
@@ -850,6 +911,7 @@
         <thead>
           <tr>
             <th>Nome</th>
+            <th>Modalidade</th>
             <th>Bairro</th>
             <th>Tipo</th>
             <th>m²</th>
@@ -860,7 +922,7 @@
         </thead>
         <tbody id="hist-body">
           <tr>
-            <td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td>
+            <td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td>
           </tr>
         </tbody>
       </table>
@@ -875,41 +937,49 @@
 
 <script>
   // ── DADOS DE BAIRROS (mesmos valores da planilha) ──
+  // rentabilidade = índice mensal estimado de aluguel sobre o valor de venda (regra de mercado)
   const BAIRROS = {
-    "Alto":             { valor: 5800, obs: "Bairro nobre, alta demanda" },
-    "Paulista":         { valor: 4200, obs: "Boa infraestrutura" },
-    "Centro":           { valor: 4500, obs: "Valorização constante" },
-    "Nova Piracicaba":  { valor: 3600, obs: "Crescimento rápido" },
-    "Jardim Elite":     { valor: 3800, obs: "Boa localização" },
-    "Presidente":       { valor: 3200, obs: "Classe média" },
-    "São Dimas":        { valor: 3400, obs: "Infraestrutura consolidada" },
-    "Piracicamirim":    { valor: 2800, obs: "Popular, boa demanda" },
-    "Ártemis":          { valor: 2600, obs: "Periferia consolidada" },
-    "Cidade Alta":      { valor: 3100, obs: "Infraestrutura em expansão" },
-    "Morumbi":          { valor: 3700, obs: "Valorização recente" },
-    "Nova América":     { valor: 3000, obs: "Estável" },
-    "Vila Rezende":     { valor: 3300, obs: "Centro expandido" },
-    "Jardim Caxambu":   { valor: 2900, obs: "Bom custo-benefício" },
-    "Outros":           { valor: 3000, obs: "Valor médio geral" },
+    "Alto":             { valor: 5800, obs: "Bairro nobre, alta demanda",      rentabilidade: 0.0045 },
+    "Paulista":         { valor: 4200, obs: "Boa infraestrutura",              rentabilidade: 0.0050 },
+    "Centro":           { valor: 4500, obs: "Valorização constante",           rentabilidade: 0.0048 },
+    "Nova Piracicaba":  { valor: 3600, obs: "Crescimento rápido",              rentabilidade: 0.0053 },
+    "Jardim Elite":     { valor: 3800, obs: "Boa localização",                 rentabilidade: 0.0050 },
+    "Presidente":       { valor: 3200, obs: "Classe média",                    rentabilidade: 0.0057 },
+    "São Dimas":        { valor: 3400, obs: "Infraestrutura consolidada",      rentabilidade: 0.0055 },
+    "Piracicamirim":    { valor: 2800, obs: "Popular, boa demanda",            rentabilidade: 0.0064 },
+    "Ártemis":          { valor: 2600, obs: "Periferia consolidada",           rentabilidade: 0.0066 },
+    "Cidade Alta":      { valor: 3100, obs: "Infraestrutura em expansão",      rentabilidade: 0.0058 },
+    "Morumbi":          { valor: 3700, obs: "Valorização recente",             rentabilidade: 0.0052 },
+    "Nova América":     { valor: 3000, obs: "Estável",                         rentabilidade: 0.0060 },
+    "Vila Rezende":     { valor: 3300, obs: "Centro expandido",                rentabilidade: 0.0056 },
+    "Jardim Caxambu":   { valor: 2900, obs: "Bom custo-benefício",             rentabilidade: 0.0062 },
+    "Outros":           { valor: 3000, obs: "Valor médio geral",               rentabilidade: 0.0058 },
   };
 
   // Renderiza bairros
   const grid = document.getElementById("bairros-grid");
-  Object.entries(BAIRROS).forEach(([nome, data]) => {
-    const el = document.createElement("div");
-    el.className = "bairro-card";
-    el.dataset.bairro = nome;
-    el.innerHTML = `
-      <div class="bairro-nome">${nome}</div>
-      <div class="bairro-valor">R$ ${data.valor.toLocaleString('pt-BR')}/m²</div>
-      <div class="bairro-obs">${data.obs}</div>`;
-    el.onclick = () => {
-      document.getElementById("bairro").value = nome;
-      calcular();
-      destacarBairro();
-    };
-    grid.appendChild(el);
-  });
+  function renderBairrosGrid() {
+    grid.innerHTML = "";
+    Object.entries(BAIRROS).forEach(([nome, data]) => {
+      const el = document.createElement("div");
+      el.className = "bairro-card";
+      el.dataset.bairro = nome;
+      const valorLinha = modalidade === "locacao"
+        ? `R$ ${Math.round(data.valor * data.rentabilidade).toLocaleString('pt-BR')}/m²/mês (aluguel est.)`
+        : `R$ ${data.valor.toLocaleString('pt-BR')}/m²`;
+      el.innerHTML = `
+        <div class="bairro-nome">${nome}</div>
+        <div class="bairro-valor">${valorLinha}</div>
+        <div class="bairro-obs">${data.obs}</div>`;
+      el.onclick = () => {
+        document.getElementById("bairro").value = nome;
+        calcular();
+        destacarBairro();
+      };
+      grid.appendChild(el);
+    });
+    destacarBairro();
+  }
 
   function destacarBairro() {
     const sel = document.getElementById("bairro").value;
@@ -952,10 +1022,37 @@
 
   function fmt(n)  { return "R$ " + n.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0}); }
   function fmtM(n) { return n.toFixed(2) + "×"; }
+  function fmtPct(n) { return (n * 100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + "%"; }
   function now()   { return new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}); }
 
   let ultimoValor = 0;
   let historico = [];
+  let modalidade = "venda"; // "venda" | "locacao"
+
+  function trocarModalidade(m) {
+    if (m !== "venda" && m !== "locacao") return;
+    modalidade = m;
+    document.querySelectorAll(".modo-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.modo === m);
+    });
+
+    const isLocacao = m === "locacao";
+    document.getElementById("campo-mobiliado").style.display = isLocacao ? "flex" : "none";
+    document.getElementById("row-mobiliado").style.display   = isLocacao ? "grid" : "none";
+    document.getElementById("row-rentabilidade").style.display = isLocacao ? "grid" : "none";
+    document.getElementById("nota-rentabilidade").style.display = isLocacao ? "block" : "none";
+
+    document.getElementById("tagline-text").textContent = isLocacao
+      ? "Estimativa inteligente de aluguel mensal baseada em dados reais da cidade."
+      : "Estimativa inteligente de valor de mercado baseada em dados reais da cidade.";
+    document.getElementById("sb-valor-label").textContent = isLocacao ? "ALUGUEL ESTIMADO" : "VALOR ESTIMADO";
+    document.getElementById("sb-m2-label").textContent    = isLocacao ? "VALOR / M² / MÊS" : "VALOR POR M²";
+    document.getElementById("c-total-label").textContent  = isLocacao ? "💰 Aluguel Mensal Estimado" : "💰 Valor Total Estimado";
+
+    renderBairrosGrid();
+    renderHistorico();
+    calcular();
+  }
 
   function calcular() {
     const nome       = document.getElementById("nome").value.trim();
@@ -965,6 +1062,7 @@
     const quartos    = parseInt(document.getElementById("quartos").value);
     const garagem    = parseInt(document.getElementById("garagem").value);
     const piscina    = document.getElementById("piscina").value;
+    const mobiliado  = document.getElementById("mobiliado").value || "Não";
     const ano        = parseInt(document.getElementById("ano").value);
     const conserv    = document.getElementById("conservacao").value;
 
@@ -983,36 +1081,51 @@
       return;
     }
 
-    const valorBase = BAIRROS[bairroSel]?.valor || 3000;
+    const bairroData = BAIRROS[bairroSel] || { valor: 3000, rentabilidade: 0.0058 };
+    const valorBase = bairroData.valor;
     const aT = ajusteTipo(tipo);
     const aQ = ajusteQuartos(quartos);
     const aG = ajusteGaragem(garagem);
     const aP = ajustePiscina(piscina);
     const aI = ajusteIdade(ano);
     const aC = ajusteConservacao(conserv);
+    const aM = mobiliado === "Sim" ? 1.18 : 1.00;
 
-    const total = m2val * valorBase * aT * aQ * aG * aP * aI * aC;
+    const valorVenda = m2val * valorBase * aT * aQ * aG * aP * aI * aC;
+    const rentabilidade = bairroData.rentabilidade;
+
+    const isLocacao = modalidade === "locacao";
+    const total = isLocacao ? valorVenda * rentabilidade * aM : valorVenda;
     ultimoValor = total;
 
     const faixaMin = total * 0.93;
     const faixaMax = total * 1.07;
     const m2Final  = total / m2val;
+    const sufixo   = isLocacao ? "/mês" : "";
 
     // Sidebar
-    document.getElementById("sb-valor").textContent = fmt(total);
-    document.getElementById("sb-sub").textContent   = (nome ? nome : "Imóvel") + " · " + bairroSel;
-    document.getElementById("sb-faixa").textContent = fmt(faixaMin) + "\n" + fmt(faixaMax);
-    document.getElementById("sb-m2").textContent    = fmt(m2Final) + "/m²";
+    document.getElementById("sb-valor").textContent = fmt(total) + sufixo;
+    document.getElementById("sb-sub").textContent   = (nome ? nome : "Imóvel") + " · " + bairroSel + " · " + (isLocacao ? "Locação" : "Venda");
+    document.getElementById("sb-faixa").textContent = fmt(faixaMin) + sufixo + "\n" + fmt(faixaMax) + sufixo;
+    document.getElementById("sb-m2").textContent    = fmt(m2Final) + "/m²" + sufixo;
 
-    // Faixa bar — visual entre 300k e 2M
-    const pct = Math.min(Math.max((total - 100000) / 1900000, 0.05), 0.97) * 100;
+    // Faixa bar — escala diferente para venda (imóvel) e locação (aluguel mensal)
+    const pct = isLocacao
+      ? Math.min(Math.max((total - 500) / 7500, 0.05), 0.97) * 100
+      : Math.min(Math.max((total - 100000) / 1900000, 0.05), 0.97) * 100;
     document.getElementById("faixa-fill").style.width = pct + "%";
 
     // Status
     let stClass, stText;
-    if (total >= 800000) { stClass = "alto";   stText = "🔥 Alto valor — Prioridade"; }
-    else if (total >= 400000) { stClass = "medio"; stText = "🟡 Valor médio — Acompanhar"; }
-    else { stClass = "padrao"; stText = "🟢 Captação padrão"; }
+    if (isLocacao) {
+      if (total >= 4000) { stClass = "alto";   stText = "🔥 Aluguel alto — Prioridade"; }
+      else if (total >= 2000) { stClass = "medio"; stText = "🟡 Aluguel médio — Acompanhar"; }
+      else { stClass = "padrao"; stText = "🟢 Captação padrão"; }
+    } else {
+      if (total >= 800000) { stClass = "alto";   stText = "🔥 Alto valor — Prioridade"; }
+      else if (total >= 400000) { stClass = "medio"; stText = "🟡 Valor médio — Acompanhar"; }
+      else { stClass = "padrao"; stText = "🟢 Captação padrão"; }
+    }
     const badge = document.getElementById("status-badge");
     badge.className = "status-badge " + stClass;
     document.getElementById("status-text").textContent = stText;
@@ -1024,27 +1137,44 @@
       <span>🛏 Quartos: ${fmtM(aQ)}</span>
       <span>🚗 Garagem: ${fmtM(aG)}</span>
       <span>🏊 Lazer: ${fmtM(aP)}</span>
+      ${isLocacao ? `<span>🛋 Mobiliado: ${fmtM(aM)}</span>` : ""}
       <span>📅 Idade: ${fmtM(aI)}</span>
       <span>🔧 Conservação: ${fmtM(aC)}</span>
+      ${isLocacao ? `<span>📈 Rentabilidade: ${fmtPct(rentabilidade)}/mês</span>` : ""}
     `;
 
     // Tabela cálculo
-    document.getElementById("c-base").textContent       = fmt(valorBase).replace("R$ ","R$ ");
+    document.getElementById("c-base").textContent       = fmt(valorBase);
     document.getElementById("c-tipo").textContent       = fmtM(aT);
     document.getElementById("c-quartos").textContent    = fmtM(aQ);
     document.getElementById("c-garagem").textContent    = fmtM(aG);
     document.getElementById("c-piscina").textContent    = fmtM(aP);
+    document.getElementById("c-mobiliado").textContent  = fmtM(aM);
     document.getElementById("c-idade").textContent      = fmtM(aI);
     document.getElementById("c-conservacao").textContent= fmtM(aC);
     document.getElementById("c-m2").textContent         = m2val + " m²";
-    document.getElementById("c-total").textContent      = fmt(total);
-    document.getElementById("c-faixa-small").innerHTML  = fmt(faixaMin) + "<br>a " + fmt(faixaMax);
+    document.getElementById("c-rentabilidade").textContent = fmtPct(rentabilidade);
+    document.getElementById("c-total").textContent      = fmt(total) + sufixo;
+    document.getElementById("c-faixa-small").innerHTML  = fmt(faixaMin) + sufixo + "<br>a " + fmt(faixaMax) + sufixo;
 
     // Mensagem WA
     const nomeFmt = nome || "proprietário(a)";
-    const dataHoje = new Date().toLocaleDateString('pt-BR');
-    const msg =
-`Olá, ${nomeFmt}! 🏠
+    const msg = isLocacao
+      ? `Olá, ${nomeFmt}! 🏠
+
+Sua avaliação de locação ficou pronta!
+
+📍 Bairro: ${bairroSel}
+🏠 Tipo: ${tipo} | ${m2val}m²
+🛏 ${quartos} quarto(s) | 🚗 ${garagem} vaga(s)${mobiliado === "Sim" ? "\n🛋 Mobiliado" : ""}
+
+💰 Aluguel mensal estimado: *${fmt(total)}/mês*
+📊 Faixa de mercado: ${fmt(faixaMin)} – ${fmt(faixaMax)} /mês
+
+Esses valores são estimativas baseadas em imóveis alugados recentemente na sua região. ✅
+
+Posso te apresentar uma proposta de locação e administração do seu imóvel. Quer marcar uma visita? 😊`
+      : `Olá, ${nomeFmt}! 🏠
 
 Sua avaliação gratuita ficou pronta!
 
@@ -1065,7 +1195,7 @@ Posso te apresentar uma proposta personalizada de venda. Quer marcar uma visita?
   }
 
   function resetCalc() {
-    ["c-base","c-tipo","c-quartos","c-garagem","c-piscina","c-idade","c-conservacao","c-m2","c-total","c-faixa-small"].forEach(id => {
+    ["c-base","c-tipo","c-quartos","c-garagem","c-piscina","c-mobiliado","c-idade","c-conservacao","c-m2","c-rentabilidade","c-total","c-faixa-small"].forEach(id => {
       document.getElementById(id).textContent = "—";
     });
     document.getElementById("wa-msg").textContent = "Preencha todos os campos para gerar a mensagem de avaliação automaticamente.";
@@ -1095,6 +1225,7 @@ Posso te apresentar uma proposta personalizada de venda. Quer marcar uma visita?
     const entry = {
       nome, bairro, tipo, m2: m2val,
       valor: ultimoValor,
+      modalidade,
       data: new Date().toLocaleDateString('pt-BR')
     };
     historico.unshift(entry);
@@ -1108,19 +1239,30 @@ Posso te apresentar uma proposta personalizada de venda. Quer marcar uma visita?
   function renderHistorico() {
     const tbody = document.getElementById("hist-body");
     if (!historico.length) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px;font-style:italic">Nenhuma avaliação registrada ainda</td></tr>`;
       return;
     }
     tbody.innerHTML = historico.map(h => {
-      const st = h.valor >= 800000 ? `<span class="tag-alto">🔥 Alto</span>`
-                : h.valor >= 400000 ? `<span class="tag-medio">🟡 Médio</span>`
-                : `<span class="tag-padrao">🟢 Padrão</span>`;
+      const isLoc = h.modalidade === "locacao";
+      const sufixo = isLoc ? "/mês" : "";
+      let st;
+      if (isLoc) {
+        st = h.valor >= 4000 ? `<span class="tag-alto">🔥 Alto</span>`
+           : h.valor >= 2000 ? `<span class="tag-medio">🟡 Médio</span>`
+           : `<span class="tag-padrao">🟢 Padrão</span>`;
+      } else {
+        st = h.valor >= 800000 ? `<span class="tag-alto">🔥 Alto</span>`
+           : h.valor >= 400000 ? `<span class="tag-medio">🟡 Médio</span>`
+           : `<span class="tag-padrao">🟢 Padrão</span>`;
+      }
+      const modTag = isLoc ? `<span class="tag-locacao">Locação</span>` : `<span class="tag-venda">Venda</span>`;
       return `<tr>
         <td><strong>${h.nome}</strong></td>
+        <td>${modTag}</td>
         <td>${h.bairro}</td>
         <td>${h.tipo}</td>
         <td>${h.m2} m²</td>
-        <td><strong style="color:var(--green)">${fmt(h.valor)}</strong></td>
+        <td><strong style="color:var(--green)">${fmt(h.valor)}${sufixo}</strong></td>
         <td>${st}</td>
         <td style="color:var(--muted);font-size:12px">${h.data}</td>
       </tr>`;
@@ -1129,6 +1271,7 @@ Posso te apresentar uma proposta personalizada de venda. Quer marcar uma visita?
 
   // Init
   document.getElementById("data-contato").valueAsDate = new Date();
+  renderBairrosGrid();
 </script>
 </body>
 </html>
