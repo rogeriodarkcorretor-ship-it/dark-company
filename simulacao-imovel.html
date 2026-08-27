@@ -52,16 +52,50 @@
     background:rgba(8,8,10,0.85);backdrop-filter:blur(16px);
     border-bottom:1px solid rgba(201,168,76,0.12);
   }
-  .logo{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:700;letter-spacing:0.06em;color:var(--gold)}
-  .logo span{color:var(--sub);font-weight:400;font-size:0.85rem;display:block;letter-spacing:0.1em}
+  .logo-img{height:46px;width:auto;display:block}
+  .header-contact{display:flex;align-items:center;gap:18px}
+  .header-wa{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--white)}
+  .header-wa-icon{width:34px;height:34px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .header-wa-text{display:flex;flex-direction:column;line-height:1.2}
+  .header-wa-text strong{font-size:0.92rem;font-weight:700}
+  .header-wa-text span{font-size:0.68rem;color:var(--sub)}
+  .header-social{display:flex;align-items:center;gap:10px}
+  .header-social a{width:34px;height:34px;border-radius:50%;background:var(--s2);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;color:var(--gold);transition:border-color 0.2s,transform 0.18s}
+  .header-social a:hover{border-color:var(--gold);transform:translateY(-2px)}
   .header-badge{font-size:0.72rem;color:var(--gold);border:1px solid rgba(201,168,76,0.3);border-radius:99px;padding:5px 14px;letter-spacing:0.08em}
+  @media(max-width:640px){ .header-wa-text{display:none} }
 
-  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px}
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 60px;
+    position:relative;overflow:hidden;
+  }
+  .hero-bg{
+    position:absolute;inset:0;z-index:-1;
+    background:
+      radial-gradient(ellipse 60% 50% at 30% 20%,rgba(201,168,76,0.14),transparent 60%),
+      radial-gradient(ellipse 50% 45% at 80% 70%,rgba(168,56,32,0.10),transparent 60%),
+      linear-gradient(160deg,#0c0c0f 0%,#08080a 55%,#0a0a0d 100%);
+  }
   .hero-label{font-size:0.72rem;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeUp 0.8s ease 0.2s forwards}
   .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,7vw,5rem);font-weight:700;line-height:1.08;letter-spacing:-0.01em;margin-bottom:24px;opacity:0;animation:fadeUp 0.9s ease 0.35s forwards}
   .hero h1 em{color:var(--gold);font-style:normal}
   .hero p{font-size:clamp(1rem,2vw,1.15rem);color:var(--sub);max-width:560px;line-height:1.7;margin:0 auto 40px;opacity:0;animation:fadeUp 0.9s ease 0.5s forwards}
-  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp 0.9s ease 0.65s forwards}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp 0.9s ease 0.65s forwards;margin-bottom:36px}
+
+  /* BARRA DE AÇÃO RÁPIDA (vidro fosco) */
+  .quick-bar{
+    display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(20px);
+    border-radius:16px;padding:6px;opacity:0;animation:fadeUp 0.9s ease 0.8s forwards;
+    max-width:420px;width:100%;
+  }
+  .quick-opt{
+    flex:1;background:transparent;border:none;color:var(--sub);font-family:'Syne',sans-serif;font-weight:600;
+    font-size:0.85rem;padding:14px 10px;border-radius:11px;cursor:pointer;transition:all 0.2s ease;
+  }
+  .quick-opt.active{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#08080a}
+  .quick-opt:hover:not(.active){color:var(--white)}
+  @media(max-width:640px){ .quick-bar{max-width:100%} }
   .btn-gold{
     background:linear-gradient(135deg,var(--gold),var(--gold2));color:#08080a;border:none;border-radius:12px;
     padding:16px 32px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;letter-spacing:0.02em;
@@ -196,20 +230,33 @@
 
 <!-- HEADER -->
 <header>
-  <div class="logo">
-    Dark Company
-    <span>Negócios Imobiliários · Piracicaba</span>
+  <img class="logo-img" src="assets/dark-company-logo.jpg" alt="Dark Company Negócios Imobiliários"/>
+  <div class="header-contact">
+    <a class="header-wa" href="https://wa.me/5519971227844?text=Ol%C3%A1%20Rog%C3%A9rio%2C%20gostaria%20de%20receber%20informa%C3%A7%C3%B5es%20sobre%20im%C3%B3veis." target="_blank" rel="noopener noreferrer">
+      <span class="header-wa-icon">💬</span>
+      <span class="header-wa-text"><strong>(19) 97122-7844</strong><span>WhatsApp</span></span>
+    </a>
+    <div class="header-social">
+      <a href="https://instagram.com/rogeriodark" target="_blank" rel="noopener noreferrer" aria-label="Instagram Rogério Dark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      </a>
+    </div>
   </div>
-  <div class="header-badge">📍 Piracicaba e região</div>
 </header>
 
 <!-- HERO -->
-<section class="hero" style="position:relative">
+<section class="hero">
+  <div class="hero-bg"></div>
   <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
     <div class="hero-label">Simulação gratuita · Rogério Dark · CRECI-SP 141032</div>
     <h1>Quer vender ou alugar<br>seu imóvel em<br><em>Piracicaba?</em></h1>
     <p>Faça uma simulação gratuita e descubra em minutos uma estimativa de valor de venda ou de aluguel do seu imóvel, com base no mercado local. Sem custo e sem compromisso.</p>
-    <div class="hero-ctas">
+
+    <div class="quick-bar" id="quick-bar">
+      <button type="button" class="quick-opt active" data-modo="venda" onclick="quickModo('venda')">Quero vender</button>
+      <button type="button" class="quick-opt" data-modo="locacao" onclick="quickModo('locacao')">Quero alugar</button>
+    </div>
+    <div class="hero-ctas" style="margin-top:20px">
       <button class="btn-gold" onclick="document.getElementById('formulario').scrollIntoView({behavior:'smooth'})">
         Fazer minha simulação grátis
       </button>
@@ -388,9 +435,14 @@
   }, {threshold:0.1});
   document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
 
+  function quickModo(m){
+    setModo(m);
+    document.getElementById("formulario").scrollIntoView({behavior:"smooth"});
+  }
+
   function setModo(m){
     modalidade = m;
-    document.querySelectorAll(".modo-opt").forEach(b => b.classList.toggle("active", b.dataset.modo === m));
+    document.querySelectorAll(".modo-opt, .quick-opt").forEach(b => b.classList.toggle("active", b.dataset.modo === m));
 
     const isLocacao = m === "locacao";
     document.getElementById("form-title").innerHTML = isLocacao
