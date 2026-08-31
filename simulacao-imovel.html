@@ -116,6 +116,43 @@
   @keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-6px)}}
   .scroll-hint::after{content:'↓';font-size:1rem}
 
+  /* SEÇÃO INSTITUCIONAL */
+  .about{margin:0 0 80px}
+  .about-wrap{
+    display:grid;grid-template-columns:340px 1fr;gap:0;align-items:stretch;
+    background:var(--s1);border:1px solid var(--b1);border-radius:24px;overflow:hidden;
+  }
+  .about-photo{position:relative;min-height:380px;background:var(--s3)}
+  .about-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .about-photo::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent 60%,var(--s1) 100%);
+    pointer-events:none;
+  }
+  .about-text{padding:44px 44px 44px 36px;display:flex;flex-direction:column;justify-content:center}
+  .about-hello{font-size:0.85rem;color:var(--sub)}
+  .about-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,3.4vw,2.6rem);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:8px}
+  .about-role{font-style:italic;font-weight:700;color:var(--gold);font-size:1rem;letter-spacing:0.02em}
+  .about-region{font-size:0.85rem;color:var(--sub);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:16px}
+  .about-desc{color:var(--text);font-size:0.95rem;line-height:1.7;max-width:460px;margin-bottom:22px}
+  .about-creci{
+    display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--gold);
+    border:1px solid rgba(201,168,76,0.3);border-radius:99px;padding:6px 14px;margin-bottom:26px;width:fit-content;
+  }
+  .about-cta{
+    display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+    color:#08080a;border:none;border-radius:12px;padding:14px 26px;font-family:'Syne',sans-serif;font-weight:700;
+    font-size:0.92rem;cursor:pointer;letter-spacing:0.02em;text-decoration:none;width:fit-content;
+    transition:transform 0.18s,box-shadow 0.18s;
+  }
+  .about-cta:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,168,76,0.22)}
+  @media(max-width:700px){
+    .about-wrap{grid-template-columns:1fr}
+    .about-photo{min-height:320px}
+    .about-photo::after{background:linear-gradient(180deg,transparent 55%,var(--s1) 100%)}
+    .about-text{padding:32px 24px}
+  }
+
   .proofs{display:flex;gap:0;border:1px solid var(--b1);border-radius:20px;overflow:hidden;margin:0 0 80px}
   .proof{flex:1;padding:26px 20px;text-align:center;border-right:1px solid var(--b1);transition:background 0.2s}
   .proof:last-child{border-right:none}
@@ -269,6 +306,24 @@
 </section>
 
 <div class="wrap">
+  <!-- SOBRE O CORRETOR -->
+  <div class="about reveal">
+    <div class="about-wrap">
+      <div class="about-photo">
+        <img src="assets/rogerio-dark.jpg" alt="Rogério Dark, corretor e avaliador de imóveis em Piracicaba"/>
+      </div>
+      <div class="about-text">
+        <div class="about-hello">Prazer, sou</div>
+        <div class="about-name">Rogério Dark</div>
+        <div class="about-role">Corretor e Avaliador de Imóveis</div>
+        <div class="about-region">Na região de Piracicaba/SP</div>
+        <p class="about-desc">Atendimento personalizado para compra, venda, avaliação e locação de imóveis em Piracicaba e região.</p>
+        <div class="about-creci">🪪 CRECI-SP 141032</div>
+        <a class="about-cta" href="https://wa.me/5519971227844?text=Ol%C3%A1%20Rog%C3%A9rio%2C%20gostaria%20de%20receber%20informa%C3%A7%C3%B5es%20sobre%20im%C3%B3veis." target="_blank" rel="noopener noreferrer">Falar com Rogério →</a>
+      </div>
+    </div>
+  </div>
+
   <!-- INDICADORES -->
   <div class="proofs reveal">
     <div class="proof">
