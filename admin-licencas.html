@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Company — Admin Licenças</title>
+<meta name="description" content="Painel administrativo de clientes, licenças e planos — Dark Company Negócios Imobiliários">
+<meta name="theme-color" content="#080808">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="admin-licencas.webmanifest">
+<link rel="icon" href="assets/icons/dk-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/dk-icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/icons/dk-icon-16.png">
+<link rel="apple-touch-icon" href="assets/icons/dk-icon-180.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #080808;
+  --dark: #0f1115;
+  --card: #141720;
+  --card2: #1a1e28;
+  --border: #242836;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-dim: rgba(201,168,76,0.12);
+  --text: #e8e6e1;
+  --muted: #6b7080;
+  --white: #f5f3ee;
+  --green: #3dba7e;
+  --green-dim: rgba(61,186,126,0.12);
+  --red: #e05252;
+  --red-dim: rgba(224,82,82,0.12);
+  --blue: #5b8dee;
+  --blue-dim: rgba(91,141,238,0.12);
+  --orange: #e8904a;
+  --orange-dim: rgba(232,144,74,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--black);position:relative;overflow:hidden}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 0%,rgba(201,168,76,0.07) 0%,transparent 70%)}
+.login-card{position:relative;z-index:1;width:100%;max-width:400px;padding:2.5rem;background:var(--card);border:1px solid var(--border);border-radius:20px}
+.login-logo{text-align:center;margin-bottom:2rem}
+.login-logo img{width:72px;height:72px;object-fit:contain;border-radius:10px;margin-bottom:12px}
+.login-logo h1{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);letter-spacing:0.02em}
+.login-logo p{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.login-field{margin-bottom:1rem}
+.login-field label{display:block;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.login-field input{width:100%;background:var(--dark);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;padding:12px 16px;outline:none;transition:border-color .2s}
+.login-field input:focus{border-color:var(--gold)}
+.login-err{color:var(--red);font-size:0.78rem;text-align:center;margin-bottom:10px;display:none}
+.btn-login{width:100%;background:var(--gold);color:var(--black);border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-login:hover{background:var(--gold-light)}
+
+/* LAYOUT */
+.app{display:none;min-height:100vh}
+.sidebar{width:240px;background:var(--dark);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:50}
+.sidebar-logo{padding:1.4rem 1.4rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo h2{font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--gold);line-height:1.2}
+.sidebar-logo p{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px}
+.sidebar-logo .admin-badge{display:inline-block;background:var(--gold-dim);color:var(--gold);font-size:0.6rem;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.08em;margin-top:6px;font-weight:600}
+nav{flex:1;padding:1rem 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 1.4rem;font-size:0.83rem;color:var(--muted);cursor:pointer;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.nav-item.active{color:var(--gold);background:var(--gold-dim);border-left-color:var(--gold)}
+.nav-item .icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-footer{padding:1rem 1.4rem;border-top:1px solid var(--border)}
+.sidebar-footer button{width:100%;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.78rem;padding:8px;cursor:pointer;transition:all .2s}
+.sidebar-footer button:hover{border-color:var(--red);color:var(--red)}
+
+.content{margin-left:240px;padding:2rem;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.topbar h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white)}
+.topbar p{color:var(--muted);font-size:0.82rem;margin-top:2px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem}
+.stat-card .stat-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.stat-card .stat-val{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;line-height:1}
+.stat-card .stat-sub{font-size:0.72rem;color:var(--muted);margin-top:6px}
+.stat-card.green .stat-val{color:var(--green)}
+.stat-card.gold .stat-val{color:var(--gold)}
+.stat-card.red .stat-val{color:var(--red)}
+.stat-card.blue .stat-val{color:var(--blue)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;margin-bottom:1.2rem}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--white);display:flex;align-items:center;gap:8px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:0.82rem}
+th{text-align:left;padding:10px 14px;font-size:0.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border);font-weight:500}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;padding:3px 9px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.badge-ativo{background:var(--green-dim);color:var(--green)}
+.badge-expirado{background:var(--red-dim);color:var(--red)}
+.badge-trial{background:var(--blue-dim);color:var(--blue)}
+.badge-suspenso{background:var(--orange-dim);color:var(--orange)}
+.badge-mensal{background:var(--gold-dim);color:var(--gold)}
+.badge-anual{background:rgba(91,141,238,0.15);color:var(--blue)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;border:none;transition:all .2s;white-space:nowrap}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-light)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red)}
+.btn-danger:hover{background:var(--red);color:white}
+.btn-green{background:var(--green);color:white}
+.btn-green:hover{opacity:.85}
+.btn-sm{padding:6px 12px;font-size:0.74rem}
+.btn-icon{padding:7px;border-radius:7px;background:transparent;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s;font-size:0.9rem}
+.btn-icon:hover{border-color:var(--gold);color:var(--gold)}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;font-weight:500}
+.field input,.field select,.field textarea{background:var(--dark);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:10px 13px;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field select option{background:var(--dark)}
+
+/* KEY BOX */
+.key-box{background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:0.88rem;color:var(--gold);letter-spacing:0.08em;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.key-box span{word-break:break-all}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:2rem;max-width:520px;width:92%;max-height:90vh;overflow-y:auto}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);margin-bottom:1.4rem}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:1.4rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:0.84rem;color:var(--text);z-index:999;display:none;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .3s ease}
+.toast.show{display:flex}
+.toast.success{border-color:var(--green)}
+.toast.error{border-color:var(--red)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* PLAN CARDS */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.plan-card{border:2px solid var(--border);border-radius:12px;padding:1.2rem;cursor:pointer;transition:all .2s;text-align:center}
+.plan-card:hover{border-color:var(--gold-light)}
+.plan-card.selected{border-color:var(--gold);background:var(--gold-dim)}
+.plan-card .plan-price{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold);font-weight:700}
+.plan-card .plan-name{font-size:0.8rem;font-weight:600;margin-bottom:4px;color:var(--text)}
+.plan-card .plan-desc{font-size:0.7rem;color:var(--muted)}
+
+/* REVENUE CHART */
+.rev-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px}
+.rev-bar{flex:1;background:var(--gold-dim);border-radius:4px 4px 0 0;position:relative;transition:background .2s;cursor:default;min-height:4px}
+.rev-bar:hover{background:rgba(201,168,76,0.3)}
+.rev-bar .rev-tip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.65rem;white-space:nowrap;color:var(--gold);display:none}
+.rev-bar:hover .rev-tip{display:block}
+.rev-labels{display:flex;gap:6px;margin-top:4px}
+.rev-labels span{flex:1;text-align:center;font-size:0.6rem;color:var(--muted)}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:1.2rem}
+.search-bar input{flex:1;background:var(--dark);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:9px 14px;outline:none}
+.search-bar input:focus{border-color:var(--gold)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:1.2rem 0}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:3rem;color:var(--muted)}
+.empty .empty-icon{font-size:2.5rem;margin-bottom:10px}
+.empty p{font-size:0.85rem}
+
+@media(max-width:900px){
+  .sidebar{width:200px}
+  .content{margin-left:200px;padding:1.2rem}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:650px){
+  .sidebar{display:none}
+  .content{margin-left:0}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid,.form-grid-3{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div style="font-size:2.5rem;margin-bottom:8px">🏢</div>
+      <h1>Dark Company</h1>
+      <p>Painel Administrativo</p>
+    </div>
+    <div class="login-field">
+      <label>Usuário</label>
+      <input id="login-user" type="text" placeholder="admin" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+    </div>
+    <div class="login-err" id="login-err">Usuário ou senha incorretos</div>
+    <button class="btn-login" onclick="fazerLogin()">Entrar no Painel</button>
+    <p style="text-align:center;font-size:0.7rem;color:var(--muted);margin-top:1rem">Acesso restrito — Dark Company © 2025</p>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>Dark Company</h2>
+      <p>Negócios Imobiliários</p>
+      <span class="admin-badge">⚙ Admin</span>
+    </div>
+    <nav>
+      <div class="nav-item active" data-page="dashboard" onclick="irPagina('dashboard',this)"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item" data-page="licencas" onclick="irPagina('licencas',this)"><span class="icon">🔑</span> Licenças</div>
+      <div class="nav-item" data-page="clientes" onclick="irPagina('clientes',this)"><span class="icon">👥</span> Clientes</div>
+      <div class="nav-item" data-page="planos" onclick="irPagina('planos',this)"><span class="icon">💎</span> Planos</div>
+      <div class="nav-item" data-page="pagamentos" onclick="irPagina('pagamentos',this)"><span class="icon">💰</span> Pagamentos</div>
+      <div class="nav-item" data-page="configuracoes" onclick="irPagina('configuracoes',this)"><span class="icon">⚙️</span> Configurações</div>
+    </nav>
+    <div class="sidebar-footer">
+      <button onclick="sair()">🚪 Sair</button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div><h1>Dashboard</h1><p id="dash-data"></p></div>
+        <button class="btn btn-gold" onclick="irPagina('licencas',document.querySelector('[data-page=licencas]'));abrirModalLicenca()">+ Nova Licença</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Licenças Ativas</div>
+          <div class="stat-val" id="stat-ativas">0</div>
+          <div class="stat-sub">clientes pagando</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-label">Receita Mensal</div>
+          <div class="stat-val" id="stat-mrr">R$0</div>
+          <div class="stat-sub">recorrente estimada</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Total Clientes</div>
+          <div class="stat-val" id="stat-clientes">0</div>
+          <div class="stat-sub">cadastrados</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Expiradas</div>
+          <div class="stat-val" id="stat-expiradas">0</div>
+          <div class="stat-sub">precisam renovar</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📈 Receita Mensal (últimos 6 meses)</div>
+          </div>
+          <div class="rev-bars" id="rev-bars"></div>
+          <div class="rev-labels" id="rev-labels"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Atividade Recente</div>
+          </div>
+          <div id="atividade-lista" style="font-size:0.8rem"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="card-header">
+          <div class="card-title">⚠️ Licenças Expirando em Breve</div>
+        </div>
+        <div id="expirando-lista">
+          <div class="empty"><div class="empty-icon">✅</div><p>Nenhuma licença expirando nos próximos 7 dias</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LICENÇAS ═══ -->
+    <div class="page" id="page-licencas">
+      <div class="topbar">
+        <div><h1>Licenças</h1><p>Gerencie todas as chaves de acesso</p></div>
+        <button class="btn btn-gold" onclick="abrirModalLicenca()">+ Nova Licença</button>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" id="search-lic" placeholder="🔍  Buscar por nome, e-mail ou chave..." oninput="filtrarLicencas()">
+        <select id="filter-status" onchange="filtrarLicencas()" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-size:0.82rem;font-family:'DM Sans',sans-serif;outline:none">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="trial">Trial</option>
+          <option value="expirado">Expirado</option>
+          <option value="suspenso">Suspenso</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Chave de Licença</th>
+                <th>Plano</th>
+                <th>Status</th>
+                <th>Expira em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-licencas"></tbody>
+          </table>
+        </div>
+        <div id="empty-licencas" class="empty" style="display:none">
+          <div class="empty-icon">🔑</div>
+          <p>Nenhuma licença encontrada</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CLIENTES ═══ -->
+    <div class="page" id="page-clientes">
+      <div class="topbar">
+        <div><h1>Clientes</h1><p>Imobiliárias e corretores cadastrados</p></div>
+        <button class="btn btn-gold" onclick="abrirModalCliente()">+ Novo Cliente</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="search-cli" placeholder="🔍  Buscar cliente..." oninput="filtrarClientes()">
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome / Empresa</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>CRECI</th>
+                <th>Licenças</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-clientes"></tbody>
+          </table>
+        </div>
+        <div id="empty-clientes" class="empty" style="display:none">
+          <div class="empty-icon">👥</div><p>Nenhum cliente cadastrado</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PLANOS ═══ -->
+    <div class="page" id="page-planos">
+      <div class="topbar">
+        <div><h1>Planos</h1><p>Defina os preços e benefícios</p></div>
+        <button class="btn btn-gold" onclick="abrirModalPlano()">+ Novo Plano</button>
+      </div>
+      <div id="lista-planos" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem"></div>
+    </div>
+
+    <!-- ═══ PAGAMENTOS ═══ -->
+    <div class="page" id="page-pagamentos">
+      <div class="topbar">
+        <div><h1>Pagamentos</h1><p>Histórico de cobranças</p></div>
+        <button class="btn btn-gold" onclick="abrirModalPagamento()">+ Registrar Pagamento</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente</th>
+                <th>Plano</th>
+                <th>Valor</th>
+                <th>Método</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-pagamentos"></tbody>
+          </table>
+        </div>
+        <div id="empty-pag" class="empty" style="display:none">
+          <div class="empty-icon">💰</div><p>Nenhum pagamento registrado</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONFIGURAÇÕES ═══ -->
+    <div class="page" id="page-configuracoes">
+      <div class="topbar"><div><h1>Configurações</h1><p>Credenciais e preferências do sistema</p></div></div>
+      <div class="card" style="max-width:540px">
+        <div class="card-title" style="margin-bottom:1.2rem">🔐 Alterar Senha Admin</div>
+        <div class="field" style="margin-bottom:1rem">
+          <label>Senha Atual</label>
+          <input id="cfg-senha-atual" type="password">
+        </div>
+        <div class="field" style="margin-bottom:1rem">
+          <label>Nova Senha</label>
+          <input id="cfg-senha-nova" type="password">
+        </div>
+        <div class="field" style="margin-bottom:1.2rem">
+          <label>Confirmar Nova Senha</label>
+          <input id="cfg-senha-conf" type="password">
+        </div>
+        <button class="btn btn-gold" onclick="alterarSenha()">Salvar Nova Senha</button>
+      </div>
+
+      <div class="card" style="max-width:540px;margin-top:1rem">
+        <div class="card-title" style="margin-bottom:1.2rem">🔑 Chave de Verificação de Licença</div>
+        <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">Cole este código no início do arquivo <code style="color:var(--gold)">laudo-vistoria.html</code> para ativar a verificação de licença.</p>
+        <div class="key-box">
+          <span id="verificador-code" style="font-size:0.72rem">Clique em "Gerar" para criar o verificador</span>
+          <button class="btn btn-outline btn-sm" onclick="gerarVerificador()">Gerar</button>
+        </div>
+        <p style="font-size:0.7rem;color:var(--muted);margin-top:8px">⚠️ O verificador lê as licenças salvas localmente. Para ambiente de produção, use um servidor.</p>
+      </div>
+
+      <div class="card" style="max-width:540px;margin-top:1rem">
+        <div class="card-title" style="margin-bottom:1.2rem">💾 Backup dos Dados</div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline" onclick="exportarDados()">⬇ Exportar JSON</button>
+          <label class="btn btn-outline" style="cursor:pointer">
+            ⬆ Importar JSON
+            <input type="file" accept=".json" style="display:none" onchange="importarDados(this)">
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ MODAL LICENÇA ═══ -->
+<div class="modal-overlay" id="modal-licenca">
+  <div class="modal">
+    <h3 id="modal-lic-titulo">🔑 Nova Licença</h3>
+    <input type="hidden" id="lic-edit-id">
+    <div class="field" style="margin-bottom:1rem">
+      <label>Cliente</label>
+      <select id="lic-cliente"></select>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Plano</label>
+      <select id="lic-plano" onchange="atualizarExpiracao()"></select>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field">
+        <label>Data de Início</label>
+        <input type="date" id="lic-inicio" onchange="atualizarExpiracao()">
+      </div>
+      <div class="field">
+        <label>Data de Expiração</label>
+        <input type="date" id="lic-expira">
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Status</label>
+      <select id="lic-status">
+        <option value="ativo">✅ Ativo</option>
+        <option value="trial">🔵 Trial</option>
+        <option value="suspenso">🟠 Suspenso</option>
+        <option value="expirado">🔴 Expirado</option>
+      </select>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Chave de Licença</label>
+      <div class="key-box">
+        <span id="lic-chave-preview" style="font-size:0.78rem">—</span>
+        <button class="btn btn-outline btn-sm" onclick="gerarChave()">↻ Gerar</button>
+      </div>
+      <input type="hidden" id="lic-chave">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModal('modal-licenca')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarLicenca()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL CLIENTE ═══ -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <h3>👤 Novo Cliente</h3>
+    <input type="hidden" id="cli-edit-id">
+    <div style="background:var(--gold-dim);border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-bottom:1rem">
+      <div style="font-size:0.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:10px">🎨 White Label — Marca do Cliente no Laudo</div>
+      <div class="form-grid" style="margin-bottom:10px">
+        <div class="field"><label>Nome da Empresa (no laudo)</label><input id="cli-empresa-laudo" type="text" placeholder="Ex: Imobiliária XYZ"></div>
+        <div class="field"><label>CRECI (no laudo)</label><input id="cli-creci-laudo" type="text" placeholder="Ex: 12345 J"></div>
+      </div>
+      <div class="field">
+        <label>Logo da Empresa</label>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+          <div id="cli-logo-preview" style="width:56px;height:56px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:var(--dark);overflow:hidden;flex-shrink:0">🏢</div>
+          <div>
+            <label class="btn btn-outline btn-sm" style="cursor:pointer">
+              📁 Escolher Logo
+              <input type="file" accept="image/*" style="display:none" onchange="carregarLogoCliente(this)">
+            </label>
+            <div style="font-size:0.68rem;color:var(--muted);margin-top:4px">PNG ou JPG — recomendado fundo escuro</div>
+          </div>
+        </div>
+        <input type="hidden" id="cli-logo-b64">
+      </div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>Nome / Empresa</label><input id="cli-nome" type="text" placeholder="Imobiliária XYZ"></div>
+      <div class="field"><label>Responsável</label><input id="cli-resp" type="text"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>E-mail</label><input id="cli-email" type="email"></div>
+      <div class="field"><label>Telefone / WhatsApp</label><input id="cli-tel" type="text"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>CRECI</label><input id="cli-creci" type="text"></div>
+      <div class="field"><label>Cidade / UF</label><input id="cli-cidade" type="text"></div>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Observações</label>
+      <textarea id="cli-obs" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;resize:vertical;min-height:70px;width:100%"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarCliente()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL PLANO ═══ -->
+<div class="modal-overlay" id="modal-plano">
+  <div class="modal">
+    <h3>💎 Novo Plano</h3>
+    <input type="hidden" id="pla-edit-id">
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>Nome do Plano</label><input id="pla-nome" type="text" placeholder="Ex: Mensal, Anual Pro"></div>
+      <div class="field"><label>Preço (R$)</label><input id="pla-preco" type="number" placeholder="0.00" step="0.01"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field">
+        <label>Ciclo de Cobrança</label>
+        <select id="pla-ciclo">
+          <option value="7">Trial (7 dias)</option>
+          <option value="30">Mensal (30 dias)</option>
+          <option value="90">Trimestral (90 dias)</option>
+          <option value="180">Semestral (180 dias)</option>
+          <option value="365">Anual (365 dias)</option>
+        </select>
+      </div>
+      <div class="field"><label>Cor / Emoji</label><input id="pla-emoji" type="text" placeholder="💎" maxlength="4"></div>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Descrição / Benefícios</label>
+      <textarea id="pla-desc" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;padding:10px 13px;outline:none;resize:vertical;min-height:80px;width:100%" placeholder="Ex: Acesso completo ao laudo, suporte por WhatsApp..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModal('modal-plano')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarPlano()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL PAGAMENTO ═══ -->
+<div class="modal-overlay" id="modal-pagamento">
+  <div class="modal">
+    <h3>💰 Registrar Pagamento</h3>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>Cliente</label><select id="pag-cliente"></select></div>
+      <div class="field"><label>Plano</label><select id="pag-plano"></select></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field"><label>Valor (R$)</label><input id="pag-valor" type="number" step="0.01"></div>
+      <div class="field"><label>Data do Pagamento</label><input id="pag-data" type="date"></div>
+    </div>
+    <div class="form-grid" style="margin-bottom:1rem">
+      <div class="field">
+        <label>Método</label>
+        <select id="pag-metodo">
+          <option>PIX</option>
+          <option>Cartão de Crédito</option>
+          <option>Boleto</option>
+          <option>Transferência</option>
+          <option>Dinheiro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="pag-status">
+          <option value="pago">✅ Pago</option>
+          <option value="pendente">🟡 Pendente</option>
+          <option value="cancelado">❌ Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:1rem">
+      <label>Observações</label>
+      <input id="pag-obs" type="text" placeholder="Ex: Renovação mensal, comprovante enviado...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="fecharModal('modal-pagamento')">Cancelar</button>
+      <button class="btn btn-gold" onclick="salvarPagamento()">💾 Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════
+const DB_KEY = 'darkcompany_admin';
+let db = {
+  adminPass: 'dark2025',
+  clientes: [],
+  licencas: [],
+  planos: [
+    { id: 'p1', nome: 'Trial', preco: 0, ciclo: 7, emoji: '🆓', desc: 'Teste gratuito por 7 dias' },
+    { id: 'p2', nome: 'Mensal', preco: 97, ciclo: 30, emoji: '🔑', desc: 'Acesso mensal completo ao laudo de vistoria' },
+    { id: 'p3', nome: 'Anual', preco: 797, ciclo: 365, emoji: '💎', desc: 'Melhor custo-benefício — 12 meses de acesso' }
+  ],
+  pagamentos: [],
+  atividades: []
+};
+
+function salvarDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function carregarDB() {
+  const s = localStorage.getItem(DB_KEY);
+  if (s) db = JSON.parse(s);
+}
+
+// ══════════════════════════════
+//  LOGIN
+// ══════════════════════════════
+function fazerLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  if ((u === 'admin' || u === 'darkcompany') && p === db.adminPass) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    iniciarApp();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    setTimeout(() => document.getElementById('login-err').style.display = 'none', 3000);
+  }
+}
+
+function sair() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ══════════════════════════════
+//  NAVEGAÇÃO
+// ══════════════════════════════
+function irPagina(id, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('page-' + id).classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'licencas') renderLicencas();
+  if (id === 'clientes') renderClientes();
+  if (id === 'planos') renderPlanos();
+  if (id === 'pagamentos') renderPagamentos();
+}
+
+// ══════════════════════════════
+//  UTILS
+// ══════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+
+function gerarChaveStr() {
+  const seg = () => Math.random().toString(36).substr(2,5).toUpperCase();
+  return `DK-${seg()}-${seg()}-${seg()}`;
+}
+
+function toast(msg, tipo = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = (tipo === 'success' ? '✅ ' : '❌ ') + msg;
+  t.className = `toast show ${tipo}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function diasRestantes(dataExpira) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const exp = new Date(dataExpira + 'T00:00:00');
+  return Math.ceil((exp - hoje) / 86400000);
+}
+
+function statusAutomatico(lic) {
+  if (lic.status === 'suspenso') return 'suspenso';
+  const dias = diasRestantes(lic.expira);
+  if (dias < 0) return 'expirado';
+  return lic.status;
+}
+
+function badgeStatus(status) {
+  const map = { ativo:'badge-ativo', expirado:'badge-expirado', trial:'badge-trial', suspenso:'badge-suspenso' };
+  const label = { ativo:'✅ Ativo', expirado:'🔴 Expirado', trial:'🔵 Trial', suspenso:'🟠 Suspenso' };
+  return `<span class="badge ${map[status] || ''}">${label[status] || status}</span>`;
+}
+
+function registrarAtividade(msg) {
+  db.atividades.unshift({ msg, ts: new Date().toLocaleString('pt-BR') });
+  if (db.atividades.length > 20) db.atividades.pop();
+  salvarDB();
+}
+
+// ══════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════
+function renderDashboard() {
+  const hoje = new Date();
+  document.getElementById('dash-data').textContent = hoje.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  const ativas = db.licencas.filter(l => statusAutomatico(l) === 'ativo' || statusAutomatico(l) === 'trial').length;
+  const expiradas = db.licencas.filter(l => statusAutomatico(l) === 'expirado').length;
+  document.getElementById('stat-ativas').textContent = ativas;
+  document.getElementById('stat-clientes').textContent = db.clientes.length;
+  document.getElementById('stat-expiradas').textContent = expiradas;
+
+  // MRR
+  let mrr = 0;
+  db.licencas.filter(l => statusAutomatico(l) === 'ativo').forEach(l => {
+    const pl = db.planos.find(p => p.id === l.planoId);
+    if (pl) mrr += (pl.preco / pl.ciclo) * 30;
+  });
+  document.getElementById('stat-mrr').textContent = 'R$' + Math.round(mrr).toLocaleString('pt-BR');
+
+  // Gráfico receita
+  const meses = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+    meses.push({ label: d.toLocaleDateString('pt-BR', { month:'short' }), val: 0 });
+  }
+  db.pagamentos.filter(p => p.status === 'pago').forEach(p => {
+    const d = new Date(p.data + 'T00:00:00');
+    const diff = (hoje.getFullYear() - d.getFullYear()) * 12 + (hoje.getMonth() - d.getMonth());
+    if (diff >= 0 && diff < 6) meses[5 - diff].val += parseFloat(p.valor) || 0;
+  });
+  const maxVal = Math.max(...meses.map(m => m.val), 1);
+  document.getElementById('rev-bars').innerHTML = meses.map(m =>
+    `<div class="rev-bar" style="height:${Math.max(4,(m.val/maxVal)*80)}px">
+      <div class="rev-tip">R$ ${m.val.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+    </div>`
+  ).join('');
+  document.getElementById('rev-labels').innerHTML = meses.map(m => `<span>${m.label}</span>`).join('');
+
+  // Atividade
+  const al = document.getElementById('atividade-lista');
+  if (!db.atividades.length) {
+    al.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Nenhuma atividade</p></div>';
+  } else {
+    al.innerHTML = db.atividades.slice(0,8).map(a =>
+      `<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="color:var(--text);font-size:0.8rem">${a.msg}</div>
+        <div style="color:var(--muted);font-size:0.68rem;margin-top:2px">${a.ts}</div>
+      </div>`
+    ).join('');
+  }
+
+  // Expirando em breve
+  const expirando = db.licencas.filter(l => {
+    const dias = diasRestantes(l.expira);
+    return dias >= 0 && dias <= 7 && statusAutomatico(l) !== 'expirado' && statusAutomatico(l) !== 'suspenso';
+  });
+  const el = document.getElementById('expirando-lista');
+  if (!expirando.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">✅</div><p>Nenhuma licença expirando nos próximos 7 dias</p></div>';
+  } else {
+    el.innerHTML = expirando.map(l => {
+      const cli = db.clientes.find(c => c.id === l.clienteId);
+      const dias = diasRestantes(l.expira);
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:0.85rem;font-weight:500">${cli?.nome || '—'}</div>
+          <div style="font-size:0.72rem;color:var(--muted)">${l.chave}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:0.8rem;color:var(--orange);font-weight:600">⚠️ ${dias} dia${dias !== 1 ? 's' : ''}</div>
+          <button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="renovarLicenca('${l.id}')">Renovar</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ══════════════════════════════
+//  LICENÇAS
+// ══════════════════════════════
+function renderLicencas(lista) {
+  const lics = lista || db.licencas;
+  const tbody = document.getElementById('tabela-licencas');
+  const empty = document.getElementById('empty-licencas');
+  if (!lics.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = lics.map(l => {
+    const cli = db.clientes.find(c => c.id === l.clienteId);
+    const pl = db.planos.find(p => p.id === l.planoId);
+    const st = statusAutomatico(l);
+    const dias = diasRestantes(l.expira);
+    const expStr = dias < 0 ? `<span style="color:var(--red)">Expirada</span>` :
+                   dias <= 7 ? `<span style="color:var(--orange)">⚠️ ${dias}d</span>` :
+                   new Date(l.expira + 'T00:00:00').toLocaleDateString('pt-BR');
+    return `<tr>
+      <td>
+        <div style="font-weight:500">${cli?.nome || '—'}</div>
+        <div style="font-size:0.72rem;color:var(--muted)">${cli?.email || ''}</div>
+      </td>
+      <td>
+        <div style="font-family:monospace;font-size:0.78rem;color:var(--gold)">${l.chave}</div>
+      </td>
+      <td><span class="badge ${pl?.ciclo === 365 ? 'badge-anual' : 'badge-mensal'}">${pl?.emoji || ''} ${pl?.nome || '—'}</span></td>
+      <td>${badgeStatus(st)}</td>
+      <td style="font-size:0.82rem">${expStr}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" title="Copiar chave" onclick="copiarChave('${l.chave}')">📋</button>
+          <button class="btn-icon" title="Editar" onclick="editarLicenca('${l.id}')">✏️</button>
+          <button class="btn-icon" title="Renovar" onclick="renovarLicenca('${l.id}')">🔄</button>
+          <button class="btn-icon" title="Excluir" onclick="excluirLicenca('${l.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filtrarLicencas() {
+  const q = document.getElementById('search-lic').value.toLowerCase();
+  const st = document.getElementById('filter-status').value;
+  const res = db.licencas.filter(l => {
+    const cli = db.clientes.find(c => c.id === l.clienteId);
+    const match = !q || l.chave.toLowerCase().includes(q) || cli?.nome.toLowerCase().includes(q) || cli?.email.toLowerCase().includes(q);
+    const matchSt = !st || statusAutomatico(l) === st;
+    return match && matchSt;
+  });
+  renderLicencas(res);
+}
+
+function abrirModalLicenca() {
+  document.getElementById('lic-edit-id').value = '';
+  document.getElementById('modal-lic-titulo').textContent = '🔑 Nova Licença';
+  preencherSelectClientes('lic-cliente');
+  preencherSelectPlanos('lic-plano');
+  document.getElementById('lic-inicio').value = new Date().toISOString().split('T')[0];
+  document.getElementById('lic-status').value = 'ativo';
+  gerarChave();
+  atualizarExpiracao();
+  document.getElementById('modal-licenca').classList.add('open');
+}
+
+function editarLicenca(id) {
+  const l = db.licencas.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('lic-edit-id').value = id;
+  document.getElementById('modal-lic-titulo').textContent = '✏️ Editar Licença';
+  preencherSelectClientes('lic-cliente', l.clienteId);
+  preencherSelectPlanos('lic-plano', l.planoId);
+  document.getElementById('lic-inicio').value = l.inicio;
+  document.getElementById('lic-expira').value = l.expira;
+  document.getElementById('lic-status').value = l.status;
+  document.getElementById('lic-chave').value = l.chave;
+  document.getElementById('lic-chave-preview').textContent = l.chave;
+  document.getElementById('modal-licenca').classList.add('open');
+}
+
+function gerarChave() {
+  const k = gerarChaveStr();
+  document.getElementById('lic-chave').value = k;
+  document.getElementById('lic-chave-preview').textContent = k;
+}
+
+function atualizarExpiracao() {
+  const inicio = document.getElementById('lic-inicio').value;
+  const planoId = document.getElementById('lic-plano').value;
+  if (!inicio || !planoId) return;
+  const pl = db.planos.find(p => p.id === planoId);
+  if (!pl) return;
+  const d = new Date(inicio + 'T00:00:00');
+  d.setDate(d.getDate() + pl.ciclo);
+  document.getElementById('lic-expira').value = d.toISOString().split('T')[0];
+}
+
+function salvarLicenca() {
+  const editId = document.getElementById('lic-edit-id').value;
+  const obj = {
+    id: editId || uid(),
+    clienteId: document.getElementById('lic-cliente').value,
+    planoId: document.getElementById('lic-plano').value,
+    inicio: document.getElementById('lic-inicio').value,
+    expira: document.getElementById('lic-expira').value,
+    status: document.getElementById('lic-status').value,
+    chave: document.getElementById('lic-chave').value
+  };
+  if (!obj.clienteId || !obj.planoId || !obj.chave) { toast('Preencha todos os campos', 'error'); return; }
+  if (editId) {
+    const idx = db.licencas.findIndex(l => l.id === editId);
+    db.licencas[idx] = obj;
+    registrarAtividade(`Licença editada: ${obj.chave}`);
+  } else {
+    db.licencas.push(obj);
+    const cli = db.clientes.find(c => c.id === obj.clienteId);
+    registrarAtividade(`Nova licença gerada para ${cli?.nome || 'cliente'}: ${obj.chave}`);
+  }
+  salvarDB();
+  renderLicencas();
+  fecharModal('modal-licenca');
+  toast('Licença salva com sucesso!');
+}
+
+function excluirLicenca(id) {
+  if (!confirm('Excluir esta licença?')) return;
+  const l = db.licencas.find(x => x.id === id);
+  db.licencas = db.licencas.filter(x => x.id !== id);
+  registrarAtividade(`Licença excluída: ${l?.chave}`);
+  salvarDB();
+  renderLicencas();
+  toast('Licença excluída');
+}
+
+function renovarLicenca(id) {
+  const l = db.licencas.find(x => x.id === id);
+  if (!l) return;
+  const pl = db.planos.find(p => p.id === l.planoId);
+  if (!pl) return;
+  const base = new Date() > new Date(l.expira + 'T00:00:00') ? new Date() : new Date(l.expira + 'T00:00:00');
+  base.setDate(base.getDate() + pl.ciclo);
+  l.expira = base.toISOString().split('T')[0];
+  l.status = 'ativo';
+  const cli = db.clientes.find(c => c.id === l.clienteId);
+  registrarAtividade(`Licença renovada: ${l.chave} (${cli?.nome})`);
+  salvarDB();
+  renderLicencas();
+  renderDashboard();
+  toast('Licença renovada até ' + new Date(l.expira + 'T00:00:00').toLocaleDateString('pt-BR'));
+}
+
+function copiarChave(chave) {
+  navigator.clipboard.writeText(chave).then(() => toast('Chave copiada!')).catch(() => toast('Erro ao copiar', 'error'));
+}
+
+// ══════════════════════════════
+//  CLIENTES
+// ══════════════════════════════
+function renderClientes(lista) {
+  const clis = lista || db.clientes;
+  const tbody = document.getElementById('tabela-clientes');
+  const empty = document.getElementById('empty-clientes');
+  if (!clis.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = clis.map(c => {
+    const nLics = db.licencas.filter(l => l.clienteId === c.id).length;
+    return `<tr>
+      <td>
+        <div style="font-weight:500">${c.nome}</div>
+        <div style="font-size:0.72rem;color:var(--muted)">${c.resp || ''}</div>
+      </td>
+      <td style="font-size:0.82rem">${c.email || '—'}</td>
+      <td style="font-size:0.82rem">${c.tel || '—'}</td>
+      <td style="font-size:0.82rem">${c.creci || '—'}</td>
+      <td><span class="badge badge-mensal">${nLics} licença${nLics !== 1 ? 's' : ''}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editarCliente('${c.id}')">✏️</button>
+          <button class="btn-icon" onclick="excluirCliente('${c.id}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filtrarClientes() {
+  const q = document.getElementById('search-cli').value.toLowerCase();
+  renderClientes(db.clientes.filter(c => !q || c.nome.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q)));
+}
+
+function abrirModalCliente() {
+  ['cli-edit-id','cli-nome','cli-resp','cli-email','cli-tel','cli-creci','cli-cidade','cli-obs','cli-empresa-laudo','cli-creci-laudo','cli-logo-b64'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('cli-logo-preview').innerHTML = '🏢';
+  document.getElementById('cli-logo-preview').style.padding = '';
+  document.getElementById('modal-cliente').classList.add('open');
+}
+
+function editarCliente(id) {
+  const c = db.clientes.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('cli-edit-id').value = id;
+  document.getElementById('cli-nome').value = c.nome || '';
+  document.getElementById('cli-resp').value = c.resp || '';
+  document.getElementById('cli-email').value = c.email || '';
+  document.getElementById('cli-tel').value = c.tel || '';
+  document.getElementById('cli-creci').value = c.creci || '';
+  document.getElementById('cli-cidade').value = c.cidade || '';
+  document.getElementById('cli-obs').value = c.obs || '';
+  document.getElementById('cli-empresa-laudo').value = c.empresaLaudo || '';
+  document.getElementById('cli-creci-laudo').value = c.creciLaudo || '';
+  document.getElementById('cli-logo-b64').value = c.logo || '';
+  const prev = document.getElementById('cli-logo-preview');
+  if (c.logo) { prev.innerHTML = ''; prev.style.padding='0'; prev.innerHTML = '<img src="'+c.logo+'" style="width:100%;height:100%;object-fit:contain;border-radius:6px">'; }
+  else { prev.innerHTML = '🏢'; }
+  document.getElementById('modal-cliente').classList.add('open');
+}
+
+function salvarCliente() {
+  const editId = document.getElementById('cli-edit-id').value;
+  const nome = document.getElementById('cli-nome').value.trim();
+  if (!nome) { toast('Informe o nome do cliente', 'error'); return; }
+  const obj = {
+    id: editId || uid(),
+    nome, resp: document.getElementById('cli-resp').value,
+    email: document.getElementById('cli-email').value,
+    tel: document.getElementById('cli-tel').value,
+    creci: document.getElementById('cli-creci').value,
+    cidade: document.getElementById('cli-cidade').value,
+    obs: document.getElementById('cli-obs').value,
+    empresaLaudo: document.getElementById('cli-empresa-laudo').value || nome,
+    creciLaudo: document.getElementById('cli-creci-laudo').value || document.getElementById('cli-creci').value,
+    logo: document.getElementById('cli-logo-b64').value
+  };
+  if (editId) { const idx = db.clientes.findIndex(c => c.id === editId); db.clientes[idx] = obj; }
+  else { db.clientes.push(obj); registrarAtividade(`Novo cliente: ${nome}`); }
+  salvarDB();
+  renderClientes();
+  fecharModal('modal-cliente');
+  toast('Cliente salvo!');
+}
+
+function excluirCliente(id) {
+  if (!confirm('Excluir este cliente? As licenças associadas serão mantidas.')) return;
+  const c = db.clientes.find(x => x.id === id);
+  db.clientes = db.clientes.filter(x => x.id !== id);
+  registrarAtividade(`Cliente excluído: ${c?.nome}`);
+  salvarDB(); renderClientes(); toast('Cliente excluído');
+}
+
+// ══════════════════════════════
+//  PLANOS
+// ══════════════════════════════
+function renderPlanos() {
+  document.getElementById('lista-planos').innerHTML = db.planos.map(p => `
+    <div class="card" style="margin-bottom:0">
+      <div style="text-align:center;margin-bottom:1rem">
+        <div style="font-size:2rem;margin-bottom:6px">${p.emoji || '💎'}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--white)">${p.nome}</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin:6px 0">R$ ${parseFloat(p.preco).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+        <div style="font-size:0.72rem;color:var(--muted)">${p.ciclo} dias</div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);text-align:center;margin-bottom:1rem;line-height:1.5">${p.desc || ''}</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="editarPlano('${p.id}')">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="excluirPlano('${p.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abrirModalPlano() {
+  ['pla-edit-id','pla-nome','pla-preco','pla-emoji','pla-desc'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('pla-ciclo').value = '30';
+  document.getElementById('modal-plano').classList.add('open');
+}
+
+function editarPlano(id) {
+  const p = db.planos.find(x => x.id === id); if (!p) return;
+  document.getElementById('pla-edit-id').value = id;
+  document.getElementById('pla-nome').value = p.nome;
+  document.getElementById('pla-preco').value = p.preco;
+  document.getElementById('pla-ciclo').value = p.ciclo;
+  document.getElementById('pla-emoji').value = p.emoji;
+  document.getElementById('pla-desc').value = p.desc;
+  document.getElementById('modal-plano').classList.add('open');
+}
+
+function salvarPlano() {
+  const editId = document.getElementById('pla-edit-id').value;
+  const obj = {
+    id: editId || uid(),
+    nome: document.getElementById('pla-nome').value.trim(),
+    preco: parseFloat(document.getElementById('pla-preco').value) || 0,
+    ciclo: parseInt(document.getElementById('pla-ciclo').value),
+    emoji: document.getElementById('pla-emoji').value || '💎',
+    desc: document.getElementById('pla-desc').value
+  };
+  if (!obj.nome) { toast('Informe o nome do plano', 'error'); return; }
+  if (editId) { const idx = db.planos.findIndex(p => p.id === editId); db.planos[idx] = obj; }
+  else db.planos.push(obj);
+  salvarDB(); renderPlanos(); fecharModal('modal-plano'); toast('Plano salvo!');
+}
+
+function excluirPlano(id) {
+  if (!confirm('Excluir este plano?')) return;
+  db.planos = db.planos.filter(p => p.id !== id);
+  salvarDB(); renderPlanos(); toast('Plano excluído');
+}
+
+// ══════════════════════════════
+//  PAGAMENTOS
+// ══════════════════════════════
+function renderPagamentos() {
+  const tbody = document.getElementById('tabela-pagamentos');
+  const empty = document.getElementById('empty-pag');
+  const sorted = [...db.pagamentos].sort((a,b) => b.data.localeCompare(a.data));
+  if (!sorted.length) { tbody.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  const statusMap = { pago:'<span class="badge badge-ativo">✅ Pago</span>', pendente:'<span class="badge badge-trial">🟡 Pendente</span>', cancelado:'<span class="badge badge-expirado">❌ Cancelado</span>' };
+  tbody.innerHTML = sorted.map(p => {
+    const cli = db.clientes.find(c => c.id === p.clienteId);
+    const pl = db.planos.find(x => x.id === p.planoId);
+    return `<tr>
+      <td style="font-size:0.82rem">${new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+      <td><div style="font-weight:500">${cli?.nome || '—'}</div></td>
+      <td style="font-size:0.82rem">${pl?.nome || '—'}</td>
+      <td style="color:var(--green);font-weight:600">R$ ${parseFloat(p.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+      <td style="font-size:0.82rem">${p.metodo}</td>
+      <td>${statusMap[p.status] || p.status}</td>
+    </tr>`;
+  }).join('');
+}
+
+function abrirModalPagamento() {
+  preencherSelectClientes('pag-cliente');
+  preencherSelectPlanos('pag-plano');
+  document.getElementById('pag-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('pag-valor').value = '';
+  document.getElementById('pag-obs').value = '';
+  document.getElementById('modal-pagamento').classList.add('open');
+}
+
+function salvarPagamento() {
+  const obj = {
+    id: uid(),
+    clienteId: document.getElementById('pag-cliente').value,
+    planoId: document.getElementById('pag-plano').value,
+    valor: document.getElementById('pag-valor').value,
+    data: document.getElementById('pag-data').value,
+    metodo: document.getElementById('pag-metodo').value,
+    status: document.getElementById('pag-status').value,
+    obs: document.getElementById('pag-obs').value
+  };
+  if (!obj.valor || !obj.clienteId) { toast('Preencha os campos obrigatórios', 'error'); return; }
+  db.pagamentos.push(obj);
+  const cli = db.clientes.find(c => c.id === obj.clienteId);
+  registrarAtividade(`Pagamento registrado: ${cli?.nome} — R$ ${parseFloat(obj.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}`);
+  salvarDB(); renderPagamentos(); fecharModal('modal-pagamento'); toast('Pagamento registrado!');
+}
+
+// ══════════════════════════════
+//  HELPERS SELECT
+// ══════════════════════════════
+function preencherSelectClientes(id, selected) {
+  const el = document.getElementById(id);
+  el.innerHTML = '<option value="">Selecione o cliente</option>' +
+    db.clientes.map(c => `<option value="${c.id}" ${c.id === selected ? 'selected' : ''}>${c.nome}</option>`).join('');
+}
+
+function preencherSelectPlanos(id, selected) {
+  const el = document.getElementById(id);
+  el.innerHTML = db.planos.map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${p.emoji} ${p.nome} — R$ ${p.preco}</option>`).join('');
+}
+
+// ══════════════════════════════
+//  CONFIGURAÇÕES
+// ══════════════════════════════
+function alterarSenha() {
+  const atual = document.getElementById('cfg-senha-atual').value;
+  const nova = document.getElementById('cfg-senha-nova').value;
+  const conf = document.getElementById('cfg-senha-conf').value;
+  if (atual !== db.adminPass) { toast('Senha atual incorreta', 'error'); return; }
+  if (nova.length < 4) { toast('Nova senha muito curta', 'error'); return; }
+  if (nova !== conf) { toast('As senhas não coincidem', 'error'); return; }
+  db.adminPass = nova;
+  salvarDB();
+  ['cfg-senha-atual','cfg-senha-nova','cfg-senha-conf'].forEach(id => document.getElementById(id).value = '');
+  toast('Senha alterada com sucesso!');
+}
+
+function carregarLogoCliente(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const b64 = e.target.result;
+    document.getElementById('cli-logo-b64').value = b64;
+    const prev = document.getElementById('cli-logo-preview');
+    prev.innerHTML = '';
+    prev.style.padding = '0';
+    prev.innerHTML = '<img src="'+b64+'" style="width:100%;height:100%;object-fit:contain;border-radius:6px">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function gerarVerificador() {
+  const lics = db.licencas.map(l => {
+    const cli = db.clientes.find(c => c.id === l.clienteId);
+    return {
+      chave: l.chave, expira: l.expira, status: l.status,
+      empresa: (cli && cli.empresaLaudo) ? cli.empresaLaudo : (cli ? cli.nome : 'Dark Company'),
+      creci: (cli && cli.creciLaudo) ? cli.creciLaudo : (cli ? cli.creci : '29072'),
+      logo: (cli && cli.logo) ? cli.logo : ''
+    };
+  });
+  const brandingJSON = JSON.stringify(lics);
+  const code = `<!-- VERIFICADOR DARK COMPANY WHITE LABEL -->\n<script>\n(function(){\n  var LICENCAS = ${brandingJSON};\n  function validarLic(chave) {\n    var lic = LICENCAS.find(function(l){ return l.chave === chave; });\n    if (!lic || lic.status === 'suspenso') return null;\n    var hoje = new Date(); hoje.setHours(0,0,0,0);\n    var exp = new Date(lic.expira + 'T00:00:00');\n    return exp >= hoje ? lic : null;\n  }\n  var saved = null;\n  try { saved = JSON.parse(localStorage.getItem('dk_session') || 'null'); } catch(e){}\n  var lic = saved ? validarLic(saved.chave) : null;\n  if (!lic) {\n    var chave = prompt('\\uD83D\\uDD11 Digite sua chave de licen\\u00E7a:');\n    lic = chave ? validarLic(chave) : null;\n    if (!lic) {\n      document.body.innerHTML = '<div style=\"min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;font-family:sans-serif;text-align:center;padding:2rem\"><div><div style=\"font-size:3rem;margin-bottom:1rem\">\\uD83D\\uDD12<\\/div><h2 style=\"color:#c9a84c;margin-bottom:8px\">Acesso Negado<\\/h2><p style=\"color:#aaa\">Licen\\u00E7a inv\\u00E1lida ou expirada.<br>Contate a Dark Company Neg\\u00F3cios Imobili\\u00E1rios.<\\/p><p style=\"margin-top:1rem\"><button onclick=\"location.reload()\" style=\"background:#c9a84c;color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer\">Tentar Novamente<\\/button><\\/p><\\/div><\\/div>';\n      return;\n    }\n    localStorage.setItem('dk_session', JSON.stringify({chave: chave}));\n  }\n  window.DK_BRANDING = { empresa: lic.empresa, creci: lic.creci, logo: lic.logo };\n  document.addEventListener('DOMContentLoaded', function() { if(window.aplicarBranding) window.aplicarBranding(); });\n  setTimeout(function(){ if(window.aplicarBranding) window.aplicarBranding(); }, 600);\n})();\n<\/script>`;
+  document.getElementById('verificador-code').textContent = '✅ Código gerado — clique em Copiar';
+  navigator.clipboard.writeText(code).then(() => toast('Código copiado! Cole no início do laudo-vistoria.html')).catch(() => {});
+}
+
+function exportarDados() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `darkcompany_backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+  a.click();
+  toast('Backup exportado!');
+}
+
+function importarDados(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!confirm('Isso vai substituir todos os dados atuais. Confirma?')) return;
+      db = imported;
+      salvarDB();
+      renderDashboard();
+      toast('Dados importados com sucesso!');
+    } catch { toast('Arquivo inválido', 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════
+//  INICIALIZAÇÃO
+// ══════════════════════════════
+function iniciarApp() {
+  renderDashboard();
+}
+
+carregarDB();
+
+// Fechar modal clicando fora
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Registra o app como instalável (permite criar ícone na área de trabalho / tela inicial)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
