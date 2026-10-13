@@ -1,0 +1,5 @@
+email,tratamento,nome,sobrenome,profissao,cidade,status
+exemplo.medico@email.com,Dr.,Carlos,Almeida,medico,Piracicaba,
+exemplo.dentista@email.com,Dra.,Fernanda,Souza,dentista,Piracicaba,
+exemplo.advogado@email.com,Dr.,Ricardo,Lima,advogado,Piracicaba,
+exemplo.empresaria@email.com,Sra.,Juliana,Moraes,empresario,Piracicaba,
