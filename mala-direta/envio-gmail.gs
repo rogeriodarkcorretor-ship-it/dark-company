@@ -1,52 +1,51 @@
 /**
- * MALA DIRETA — DARK COMPANY (Google Sheets + Gmail)
+ * MALA DIRETA — DARK COMPANY · INFINITY BUSINESS TOWER (Google Sheets + Gmail)
  *
  * Como usar:
  * 1. Importe lista-contatos-modelo.csv numa Planilha Google (aba "Contatos").
- * 2. Extensões > Apps Script > cole este arquivo.
- * 3. Crie um arquivo HTML no projeto chamado "email" e cole o conteúdo de email-classe-a.html.
- * 4. Rode testarComigo() primeiro. Depois rode enviarLote() (envia até LIMITE_POR_EXECUCAO).
- * 5. A coluna "status" é preenchida com ENVIADO/ERRO — reexecutar não reenvia.
+ * 2. Suba infinity-business-tower.jpg no Google Drive e copie o ID do arquivo
+ *    (o trecho entre /d/ e /view no link) para IMAGEM_DRIVE_ID abaixo.
+ * 3. Extensões > Apps Script > cole este arquivo.
+ *    Crie um arquivo HTML no projeto chamado "email" e cole o conteúdo de email-classe-a.html.
+ * 4. Rode testarComigo() — o e-mail chega para você. Confira no celular e no computador.
+ * 5. Rode enviarLote() quantas vezes precisar (envia até LIMITE_POR_EXECUCAO por vez).
+ *    A coluna "status" recebe ENVIADO/ERRO — reexecutar não reenvia para quem já recebeu.
+ *    Para descadastrar alguém, escreva SAIR na coluna "status".
  */
 
 const ABA = 'Contatos';
-const LIMITE_POR_EXECUCAO = 50;   // Gmail pessoal: 500/dia · Workspace: 2.000/dia. Comece baixo.
+const IMAGEM_DRIVE_ID = 'COLE_AQUI_O_ID_DA_IMAGEM_NO_DRIVE';
+const LIMITE_POR_EXECUCAO = 50;   // Gmail pessoal: ~100–500/dia · Workspace: até 2.000/dia. Comece baixo.
 const PAUSA_MS = 4000;            // intervalo entre e-mails (melhora entregabilidade)
 const REMETENTE_NOME = 'Rogério · Dark Company';
 const DESCADASTRO = 'mailto:' + Session.getActiveUser().getEmail() + '?subject=SAIR';
 
-const PERFIS = {
-  medico: {
-    assunto: '{{tratamento}} {{nome}}, uma curadoria reservada de imóveis em {{cidade}}',
-    abertura: 'Sei que a agenda de quem cuida de pacientes raramente deixa espaço para visitar dezenas de imóveis. Por isso escrevo de forma direta: alguns dos imóveis mais interessantes de {{cidade}} são negociados de maneira reservada e nunca chegam aos portais.'
-  },
-  dentista: {
-    assunto: '{{tratamento}} {{nome}}, imóveis de alto padrão fora dos portais',
-    abertura: 'Entre consultório, equipe e pacientes, o seu tempo é o ativo mais disputado da semana. Por isso escrevo de forma direta: alguns dos imóveis mais interessantes de {{cidade}} são negociados de maneira reservada e nunca chegam aos portais.'
-  },
-  advogado: {
-    assunto: '{{tratamento}} {{nome}}, uma seleção reservada — com documentação analisada',
-    abertura: 'Quem conhece de perto o peso de um contrato bem feito sabe que, em imóveis, o risco costuma estar no que não foi verificado. Alguns dos imóveis mais interessantes de {{cidade}} são negociados de maneira reservada — e nós os apresentamos com a documentação já analisada.'
-  },
-  empresario: {
-    assunto: '{{nome}}, oportunidades imobiliárias reservadas em {{cidade}}',
-    abertura: 'Para quem toma decisões de negócio todos os dias, um imóvel é mais do que um endereço: é patrimônio, liquidez e posicionamento. Alguns dos imóveis mais interessantes de {{cidade}} são negociados de maneira reservada e nunca chegam aos portais.'
-  }
+// Assunto por perfil. {{saudacao}} = "Dr. Carlos", "Juliana" etc.
+const ASSUNTOS = {
+  medico:     '{{saudacao}}, em primeira mão: Infinity Business Tower em Piracicaba',
+  dentista:   '{{saudacao}}, em primeira mão: Infinity Business Tower em Piracicaba',
+  advogado:   '{{saudacao}}, pré-lançamento exclusivo: Infinity Business Tower',
+  empresario: '{{saudacao}}, a nova torre corporativa de Piracicaba — pré-lançamento'
 };
+const ASSUNTO_PADRAO = '{{saudacao}}, pré-lançamento exclusivo em Piracicaba';
 
-function mesclar_(texto, dados) {
-  return texto.replace(/{{(\w+)}}/g, (_, k) => (dados[k] !== undefined && dados[k] !== '' ? dados[k] : ''))
-              .replace(/\s{2,}/g, ' ').trim();
+function saudacao_(c) {
+  const trat = String(c.tratamento || '').trim();
+  // Dr./Dra. ficam na saudação; Sr./Sra. soam formais demais num "Olá, ..., tudo bem?"
+  return (/^dra?\.?$/i.test(trat) ? trat + ' ' : '') + String(c.nome || '').trim();
 }
 
 function montar_(c) {
-  const perfil = PERFIS[String(c.profissao).toLowerCase().trim()] || PERFIS.empresario;
-  const dados = Object.assign({ cidade: 'Piracicaba', link_descadastro: DESCADASTRO }, c);
-  if (!dados.cidade) dados.cidade = 'Piracicaba';
-  dados.abertura = mesclar_(perfil.abertura, dados);
+  const dados = { saudacao: saudacao_(c), imagem: 'cid:infinity', link_descadastro: DESCADASTRO };
+  const assunto = (ASSUNTOS[String(c.profissao).toLowerCase().trim()] || ASSUNTO_PADRAO)
+                    .replace(/{{(\w+)}}/g, (_, k) => dados[k] || '');
   const html = HtmlService.createHtmlOutputFromFile('email').getContent()
                  .replace(/{{(\w+)}}/g, (_, k) => dados[k] || '');
-  return { assunto: mesclar_(perfil.assunto, dados), html: html };
+  return { assunto, html };
+}
+
+function imagem_() {
+  return DriveApp.getFileById(IMAGEM_DRIVE_ID).getBlob().setName('infinity.jpg');
 }
 
 function lerContatos_() {
@@ -59,20 +58,23 @@ function testarComigo() {
   const { cab, linhas } = lerContatos_();
   const c = Object.fromEntries(cab.map((h, i) => [h, linhas[0][i]]));
   const m = montar_(c);
-  GmailApp.sendEmail(Session.getActiveUser().getEmail(), '[TESTE] ' + m.assunto, '', { htmlBody: m.html, name: REMETENTE_NOME });
+  GmailApp.sendEmail(Session.getActiveUser().getEmail(), '[TESTE] ' + m.assunto, '', {
+    htmlBody: m.html, name: REMETENTE_NOME, inlineImages: { infinity: imagem_() }
+  });
 }
 
 function enviarLote() {
   const { sh, cab, linhas } = lerContatos_();
   const colStatus = cab.indexOf('status');
+  const img = imagem_();
   let enviados = 0;
   for (let i = 0; i < linhas.length && enviados < LIMITE_POR_EXECUCAO; i++) {
     const c = Object.fromEntries(cab.map((h, j) => [h, linhas[i][j]]));
-    if (!c.email || c.status) continue;               // pula vazios, já enviados e descadastrados
+    if (!c.email || c.status) continue;               // pula vazios, já enviados e descadastrados (SAIR)
     try {
       const m = montar_(c);
       GmailApp.sendEmail(c.email, m.assunto, '', {
-        htmlBody: m.html, name: REMETENTE_NOME
+        htmlBody: m.html, name: REMETENTE_NOME, inlineImages: { infinity: img }
       });
       sh.getRange(i + 2, colStatus + 1).setValue('ENVIADO ' + new Date().toLocaleString('pt-BR'));
       enviados++;
