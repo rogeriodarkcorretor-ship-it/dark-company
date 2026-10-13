@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infinity Business Tower · Pré-lançamento | Dark Company</title>
+<meta name="description" content="Pré-lançamento exclusivo em Piracicaba: torre corporativa com 37 pavimentos, salas a partir de 42 m² e lajes de até 420 m²+. Receba as condições em primeira mão.">
+<meta property="og:title" content="Infinity Business Tower · Pré-lançamento exclusivo">
+<meta property="og:description" content="37 pavimentos · salas a partir de 42 m² · lajes até 420 m²+. Receba as condições em primeira mão.">
+<meta property="og:image" content="assets/infinity-torre.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0B0B0B; --graphite:#1C1C1C; --warm:#F4F1EA; --white:#FFFFFF;
+    --gold:#C6A15B; --muted:#8A8578; --ink2:#55524B; --line:#E6E1D6;
+    --serif:'Droid Serif',Georgia,'Times New Roman',serif;
+    --sans:'Poppins',Arial,Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--warm);color:var(--black);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  img{display:block;max-width:100%}
+  a{color:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+  .eyebrow{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+  .rule{width:56px;height:1px;background:var(--gold)}
+
+  /* topo */
+  .top{position:absolute;inset:0 0 auto 0;z-index:3;padding:28px 0}
+  .top .wrap{display:flex;justify-content:space-between;align-items:center}
+  .brand{font-family:var(--serif);letter-spacing:.24em;font-size:14px;color:var(--white)}
+  .top a.cta-mini{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--white);text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:4px}
+
+  /* hero */
+  .hero{position:relative;background:var(--black);color:var(--white);overflow:hidden}
+  .hero .grid{display:grid;grid-template-columns:1.15fr .85fr;min-height:100vh;min-height:100svh}
+  .hero .copy{padding:150px 56px 72px 0;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(56px,9vw,128px);line-height:.92;letter-spacing:-.02em;margin-top:22px}
+  .hero h1 em{display:block;color:var(--gold);font-size:.42em;letter-spacing:.32em;font-style:normal;text-transform:uppercase;margin-top:18px;font-family:var(--sans);font-weight:300}
+  .hero p.lead{margin-top:32px;max-width:460px;color:#CFCAC0;font-size:17px;line-height:1.65}
+  .hero .actions{margin-top:40px;display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+  .btn{display:inline-block;background:var(--gold);color:var(--black);text-decoration:none;font-weight:500;font-size:13px;letter-spacing:.16em;text-transform:uppercase;padding:18px 30px;border:0;cursor:pointer;font-family:var(--sans)}
+  .btn:hover{background:#d4b170}
+  .link{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--white);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.35);padding-bottom:4px}
+  .hero .photo{position:relative;margin-right:calc((100vw - min(1180px,100vw))/-2 - 32px)}
+  .hero .photo img{width:100%;height:100%;object-fit:cover;object-position:30% 30%}
+  .hero .photo::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--black) 0%,rgba(11,11,11,0) 28%);z-index:1}
+  .hero .tag{position:absolute;right:32px;bottom:32px;z-index:2;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+
+  /* números */
+  .numbers{background:var(--warm);padding:110px 0 90px}
+  .numbers .head{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:end;margin-bottom:72px}
+  .numbers h2{font-family:var(--serif);font-weight:400;font-size:clamp(34px,4.4vw,56px);line-height:1.08}
+  .numbers h2 i{color:var(--ink2)}
+  .numbers .head p{color:var(--ink2);max-width:440px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--black)}
+  .stat{padding:28px 24px 0 0}
+  .stat + .stat{padding-left:24px;border-left:1px solid var(--line)}
+  .stat b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(48px,6vw,84px);line-height:1}
+  .stat b small{font-size:.38em;margin-left:4px}
+  .stat span{display:block;margin-top:14px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+  .stat em{display:block;font-style:normal;font-size:13px;color:var(--muted);margin-top:6px}
+
+  /* valor + fachada */
+  .value{display:grid;grid-template-columns:1fr 1fr;background:var(--black);color:var(--white)}
+  .value .img{min-height:520px;background:url('assets/infinity-fachada.jpg') center/cover no-repeat}
+  .value .txt{padding:96px 72px;display:flex;flex-direction:column;justify-content:center}
+  .value .price{font-family:var(--serif);font-size:clamp(52px,6vw,88px);line-height:1;margin-top:20px}
+  .value .price small{font-size:.36em;color:var(--gold)}
+  .value p{color:#CFCAC0;margin-top:28px;max-width:420px}
+  .value .quote{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--white);margin-top:44px;padding-top:28px;border-top:1px solid rgba(198,161,91,.4);max-width:420px}
+
+  /* formulário */
+  .form-sec{background:var(--warm);padding:120px 0}
+  .form-sec .grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:80px;align-items:start}
+  .form-sec h2{font-family:var(--serif);font-weight:400;font-size:clamp(36px,4.6vw,60px);line-height:1.05;margin-top:22px}
+  .form-sec .intro p{color:var(--ink2);margin-top:24px;max-width:400px}
+  .form-sec ol{list-style:none;margin-top:40px;counter-reset:s}
+  .form-sec ol li{counter-increment:s;display:flex;gap:18px;padding:16px 0;border-top:1px solid var(--line);font-size:15px;color:var(--graphite)}
+  .form-sec ol li::before{content:"0" counter(s);font-family:var(--serif);color:var(--gold);font-size:20px;line-height:1.3}
+  form{background:var(--white);padding:48px}
+  .field{margin-bottom:22px}
+  label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);margin-bottom:8px}
+  input,select{width:100%;font-family:var(--sans);font-size:16px;color:var(--black);background:transparent;border:0;border-bottom:1px solid #CFC9BC;padding:10px 0;border-radius:0;outline:none;-webkit-appearance:none;appearance:none}
+  select{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%230B0B0B' stroke-width='1.2'/%3E%3C/svg%3E") right 4px center no-repeat}
+  input:focus,select:focus{border-bottom-color:var(--gold)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px}
+  .chips label{margin:0;cursor:pointer;text-transform:none;letter-spacing:0;font-size:14px;color:var(--black);border:1px solid #CFC9BC;padding:10px 16px}
+  .chips input{display:none}
+  .chips label:has(input:checked){border-color:var(--black);background:var(--black);color:var(--white)}
+  .consent{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--ink2);text-transform:none;letter-spacing:0;margin:8px 0 28px;cursor:pointer}
+  .consent input{width:18px;height:18px;flex:none;margin-top:2px;border:1px solid #CFC9BC;-webkit-appearance:auto;appearance:auto;accent-color:var(--black)}
+  form .btn{width:100%;background:var(--black);color:var(--white);padding:20px}
+  form .btn:hover{background:var(--graphite)}
+  .err{color:#4A1F29;font-size:13px;margin-top:14px;min-height:20px}
+  .ok{display:none;text-align:left}
+  .ok h3{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.15;margin-top:18px}
+  .ok p{color:var(--ink2);margin-top:16px}
+
+  footer{background:var(--black);color:#8A8578;padding:56px 0;font-size:12px;line-height:1.7}
+  footer .wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:48px}
+  footer .brand{color:var(--white)}
+  footer p + p{margin-top:8px}
+
+  .float-wa{position:fixed;right:20px;bottom:20px;z-index:10;background:var(--black);color:var(--white);border:1px solid var(--gold);text-decoration:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:14px 18px;display:none}
+
+  @media (max-width:900px){
+    .wrap{padding:0 20px}
+    .hero .grid{grid-template-columns:1fr;min-height:auto}
+    .hero .photo{order:-1;height:62vh;margin:0 -20px}
+    .hero .photo::before{background:linear-gradient(0deg,var(--black) 0%,rgba(11,11,11,0) 45%)}
+    .hero .copy{padding:0 0 64px;margin-top:-120px}
+    .hero .tag{display:none}
+    .numbers{padding:72px 0 64px}
+    .numbers .head{grid-template-columns:1fr;gap:20px;margin-bottom:44px}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat,.stat + .stat{padding:24px 12px 24px 0;border-left:0;border-bottom:1px solid var(--line)}
+    .stat:nth-child(even){padding-left:16px;border-left:1px solid var(--line)}
+    .value{grid-template-columns:1fr}
+    .value .img{min-height:300px}
+    .value .txt{padding:64px 20px}
+    .form-sec{padding:72px 0}
+    .form-sec .grid{grid-template-columns:1fr;gap:44px}
+    form{padding:32px 22px}
+    .row{grid-template-columns:1fr;gap:0}
+    footer .wrap{grid-template-columns:1fr;gap:20px}
+    .float-wa{display:block}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">DARK COMPANY</div>
+    <a class="cta-mini" href="#condicoes">Receber condições</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap grid">
+    <div class="copy">
+      <div class="rule"></div>
+      <p class="eyebrow" style="margin-top:22px">Pré-lançamento exclusivo · Piracicaba</p>
+      <h1>Infinity<em>Business Tower</em></h1>
+      <p class="lead">O maior prédio corporativo do interior de São Paulo está chegando a Piracicaba. Um novo capítulo para o mercado corporativo da cidade — apresentado primeiro a um grupo seleto de investidores.</p>
+      <div class="actions">
+        <a class="btn" href="#condicoes">Quero receber as condições</a>
+        <a class="link" href="#numeros">Conhecer o projeto</a>
+      </div>
+    </div>
+    <div class="photo">
+      <img src="assets/infinity-torre.jpg" alt="Perspectiva da torre Infinity Business Tower em Piracicaba">
+      <span class="tag">Imagem ilustrativa</span>
+    </div>
+  </div>
+</section>
+
+<section class="numbers" id="numeros">
+  <div class="wrap">
+    <div class="head">
+      <h2>Escala para empresas.<br><i>Posição para investidores.</i></h2>
+      <p>Um empreendimento de grande porte, pensado para empresas, profissionais e investidores que buscam posicionamento estratégico em Piracicaba — de salas compactas a lajes corporativas completas.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>37</b><span>Pavimentos</span></div>
+      <div class="stat"><b>11</b><span>Elevadores</span><em>sendo 1 para ambulância / maca</em></div>
+      <div class="stat"><b>42<small>m²</small></b><span>Salas a partir de</span></div>
+      <div class="stat"><b>420<small>m²+</small></b><span>Lajes corporativas</span><em>completas ou meias-lajes</em></div>
+    </div>
+    <p style="margin-top:36px;font-size:14px;color:var(--ink2)">Valet, doca e infraestrutura completa.</p>
+  </div>
+</section>
+
+<section class="value">
+  <div class="img" role="img" aria-label="Fachada do Infinity Business Tower ao entardecer (ilustrativa)"></div>
+  <div class="txt">
+    <p class="eyebrow">Valor médio estimado</p>
+    <div class="price">R$ 13.800<small>/m²</small></div>
+    <p>Fluxo de pagamento direto com a construtora durante o período de obras.</p>
+    <p class="quote">No pré-lançamento, as primeiras escolhas ficam com quem chega antes.</p>
+  </div>
+</section>
+
+<section class="form-sec" id="condicoes">
+  <div class="wrap grid">
+    <div class="intro">
+      <div class="rule"></div>
+      <h2>Receba as condições em primeira mão.</h2>
+      <p>Deixe seu contato e envio os detalhes, a tabela e as condições do pré-lançamento antes da divulgação ampla.</p>
+      <ol>
+        <li>Você recebe o material completo por e-mail e WhatsApp.</li>
+        <li>Conversamos sobre o seu objetivo: uso próprio ou investimento.</li>
+        <li>Você avalia as unidades disponíveis sem compromisso.</li>
+      </ol>
+    </div>
+
+    <div>
+      <form id="lead" novalidate>
+        <div class="field"><label for="nome">Nome completo</label><input id="nome" name="nome" autocomplete="name" required></div>
+        <div class="row">
+          <div class="field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="telefone">WhatsApp</label><input id="telefone" name="telefone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(19) 9 0000-0000" required></div>
+        </div>
+        <div class="field">
+          <label for="profissao">Atuação</label>
+          <select id="profissao" name="profissao" required>
+            <option value="" selected disabled>Selecione</option>
+            <option value="medico">Médico(a)</option>
+            <option value="dentista">Dentista</option>
+            <option value="advogado">Advogado(a)</option>
+            <option value="empresario">Empresário(a)</option>
+            <option value="investidor">Investidor(a)</option>
+            <option value="outro">Outra</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Interesse</label>
+          <div class="chips">
+            <label><input type="radio" name="interesse" value="sala" checked><span>Sala comercial</span></label>
+            <label><input type="radio" name="interesse" value="laje"><span>Laje corporativa</span></label>
+            <label><input type="radio" name="interesse" value="investimento"><span>Investimento</span></label>
+          </div>
+        </div>
+        <label class="consent"><input type="checkbox" id="consent" name="consent" required>
+          <span>Autorizo a Dark Company a me enviar informações sobre este e outros empreendimentos por e-mail e WhatsApp. Posso cancelar quando quiser.</span></label>
+        <button class="btn" type="submit">Receber as condições</button>
+        <p class="err" id="err" role="alert"></p>
+      </form>
+
+      <div class="ok" id="ok">
+        <div class="rule"></div>
+        <h3>Recebido. Obrigado, <span id="okName"></span>.</h3>
+        <p>Em breve você recebe os detalhes do Infinity Business Tower. Se preferir adiantar, estou abrindo o WhatsApp para você.</p>
+        <p style="margin-top:28px"><a class="btn" id="okWa" href="#" style="background:var(--black);color:var(--white)">Abrir WhatsApp</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="brand">DARK COMPANY</div>
+      <p style="margin-top:10px">Negócios Imobiliários · Piracicaba/SP<br>WhatsApp (19) 97122-7844 · @rogeriodark</p>
+    </div>
+    <div>
+      <p>Imagens ilustrativas. Valores, metragens e condições estimados, sujeitos a alteração e à confirmação da construtora no lançamento oficial. Este material não constitui oferta pública de venda.</p>
+      <p>Seus dados são usados apenas para o contato solicitado, conforme a LGPD (Lei 13.709/2018). Para cancelar, responda “SAIR” a qualquer mensagem.</p>
+    </div>
+  </div>
+</footer>
+
+<a class="float-wa" href="#condicoes">Receber condições</a>
+
+<script>
+  // URL do Web App do Apps Script (ver mala-direta/envio-gmail.gs → doPost). Vazio = só WhatsApp.
+  const ENDPOINT = '';
+  const WHATSAPP = '5519971227844';
+
+  const f = document.getElementById('lead');
+  const err = document.getElementById('err');
+
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    const d = Object.fromEntries(new FormData(f));
+    const email = (d.email || '').trim();
+    const tel = (d.telefone || '').replace(/\D/g, '');
+    if (!d.nome || d.nome.trim().length < 3) return err.textContent = 'Informe seu nome.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return err.textContent = 'Informe um e-mail válido.';
+    if (tel.length < 10) return err.textContent = 'Informe um WhatsApp com DDD.';
+    if (!d.profissao) return err.textContent = 'Selecione sua atuação.';
+    if (!document.getElementById('consent').checked) return err.textContent = 'Marque a autorização para recebermos seu contato.';
+
+    const btn = f.querySelector('button');
+    btn.disabled = true; btn.textContent = 'Enviando…';
+
+    const partes = d.nome.trim().split(/\s+/);
+    const payload = new URLSearchParams({
+      nome: partes[0], sobrenome: partes.slice(1).join(' '), email, telefone: tel,
+      profissao: d.profissao, interesse: d.interesse || '', cidade: 'Piracicaba',
+      origem: 'landing-infinity' + (location.search ? ' ' + location.search : ''),
+      consentimento: new Date().toISOString()
+    });
+    if (ENDPOINT) {
+      try { await fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: payload }); } catch (_) {}
+    }
+
+    const interesseTxt = { sala: 'sala comercial', laje: 'laje corporativa', investimento: 'investimento' }[d.interesse] || '';
+    const msg = `Olá, Rogério! Sou ${d.nome.trim()} e quero receber os detalhes e condições do Infinity Business Tower` + (interesseTxt ? ` (interesse: ${interesseTxt}).` : '.');
+    const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+
+    f.style.display = 'none';
+    document.getElementById('okName').textContent = partes[0];
+    document.getElementById('okWa').href = wa;
+    document.getElementById('ok').style.display = 'block';
+    setTimeout(() => { window.open(wa, '_blank'); }, 900);
+  });
+</script>
+</body>
+</html>

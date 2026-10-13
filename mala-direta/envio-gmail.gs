@@ -85,3 +85,31 @@ function enviarLote() {
   }
   Logger.log(enviados + ' e-mails enviados. Cota restante hoje: ' + MailApp.getRemainingDailyQuota());
 }
+
+/**
+ * CAPTAÇÃO — recebe os cadastros da página infinity-business-tower.html
+ * Implantar > Nova implantação > Tipo "App da Web" > Executar como: Eu · Acesso: Qualquer pessoa.
+ * Copie a URL gerada e cole em ENDPOINT no <script> da página.
+ * Cada cadastro entra como nova linha na aba "Contatos" (status vazio = entra no próximo enviarLote()).
+ */
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const p = e.parameter || {};
+    const email = String(p.email || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || !p.consentimento) {
+      return ContentService.createTextOutput('invalid');
+    }
+    const { sh, cab, linhas } = lerContatos_();
+    const colEmail = cab.indexOf('email');
+    if (linhas.some(l => String(l[colEmail]).trim().toLowerCase() === email)) {
+      return ContentService.createTextOutput('duplicate');
+    }
+    const dados = Object.assign({}, p, { email: email, status: '' });
+    sh.appendRow(cab.map(h => (dados[h] !== undefined ? String(dados[h]).slice(0, 200) : '')));
+    return ContentService.createTextOutput('ok');
+  } finally {
+    lock.releaseLock();
+  }
+}
